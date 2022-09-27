@@ -1,0 +1,19 @@
+services:
+  webserver:
+    profiles:
+      - only-webserver
+    build: ./webserver
+    ports:
+      - "${WEBSERVER_PORT}:8000"
+  postgres:
+    profiles:
+      - only-database
+    image: postgres
+    restart: always
+    ports:
+      - ${POSTGRES_PORT}:5432
+    environment:
+      POSTGRES_PASSWORD: admin
+      POSTGRES_USER: admin
+      POSTGRES_DB: racun
+
