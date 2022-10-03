@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id         Int    @id @default(autoincrement())
+    first_name String @db.VarChar(280)
+    last_name  String @db.VarChar(280)
+    password   String
+    email      String @unique @db.VarChar(280)
+}
+
+model Place {
+    id   Int    @id @default(autoincrement())
+    name String @db.VarChar(255)
+
+    parentPlaceId Int?
+    parentPlace   Place?  @relation("PlaceHierarchy", fields: [parentPlaceId], references: [id])
+    places        Place[] @relation("PlaceHierarchy")
+
+    clientContracts ClientContract[]
+}
+
+model Service {
+    id              Int              @id @default(autoincrement())
+    name            String           @db.VarChar(255)
+    description     String
+    clientContracts ClientContract[]
+}
+
+model Client {
+    id            Int            @id @default(autoincrement())
+    first_name    String         @db.VarChar(280)
+    last_name     String         @db.VarChar(280)
+    document      String         @db.VarChar(100)
+    phone         String         @db.VarChar(100)
+    address       String         @db.VarChar(255)
+    email         String?        @db.VarChar(255)
+    ClientAccount ClientAccount?
+}
+
+model ClientAccount {
+    id     Int @id @default(autoincrement())
+    status Int
+
+    client          Client           @relation(fields: [clientId], references: [id])
+    clientId        Int              @unique
+    clientContracts ClientContract[]
+}
+
+model ClientContract {
+    id        Int      @id @default(autoincrement())
+    value     Float
+    status    Int
+    dateStart DateTime
+
+    clientAccountId Int
+    clientAccount   ClientAccount @relation(fields: [clientAccountId], references: [id])
+
+    placeId Int
+    place   Place @relation(fields: [placeId], references: [id])
+
+    serviceId Int
+    service   Service   @relation(fields: [serviceId], references: [id])
+    invoices  Invoice[]
+}
+
+model Invoice {
+    id             Int      @id @default(autoincrement())
+    generationDate DateTime
+    periodStart    DateTime
+    periodEnd      DateTime
+    paymentDate    DateTime
+    suspensionDate DateTime
+    value          Float
+    adjustment     Float
+    status         Int
+
+    contractId Int
+    contract   ClientContract @relation(fields: [contractId], references: [id])
+}
