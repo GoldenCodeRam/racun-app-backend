@@ -8,17 +8,21 @@
   "license": "MIT",
   "dependencies": {
     "@prisma/client": "4.4.0",
+    "bcrypt": "^5.0.1",
     "dotenv": "^16.0.2",
-    "express": "^4.18.1",
-    "seed": "ts-node prisma/seed.ts"
+    "express": "^4.18.1"
+  },
+  "prisma": {
+    "seed": "ts-node-esm prisma/seed.ts"
   },
   "scripts": {
     "start": "tsc && node ./out/main.js"
   },
   "devDependencies": {
     "@faker-js/faker": "^7.5.0",
+    "@types/bcrypt": "^5.0.0",
     "@types/express": "^4.17.14",
-    "@types/node": "^18.8.0",
+    "@types/node": "^18.8.1",
     "prisma": "^4.4.0",
     "ts-node": "^10.9.1",
     "typescript": "^4.8.4"
