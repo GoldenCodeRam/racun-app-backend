@@ -65,4 +65,16 @@ export function configureAuthModule(app: any) {
             response.sendStatus(200);
         },
     );
+
+    app.get(
+        '/auth/canActivate',
+        (request: Request, response: Response) => {
+            console.log(request.user);
+            if (request.user) {
+                response.sendStatus(200);
+            } else {
+                response.sendStatus(401);
+            }
+        },
+    );
 }

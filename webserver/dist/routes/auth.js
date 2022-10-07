@@ -105,5 +105,14 @@ export function configureAuthModule(app) {
     }), function (request, response) {
         response.sendStatus(200);
     });
+    app.get('/auth/canActivate', function (request, response) {
+        console.log(request.user);
+        if (request.user) {
+            response.sendStatus(200);
+        }
+        else {
+            response.sendStatus(401);
+        }
+    });
 }
 //# sourceMappingURL=auth.js.map

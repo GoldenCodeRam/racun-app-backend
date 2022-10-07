@@ -12,15 +12,18 @@ app.use(json());
 app.use(urlencoded({
     extended: true
 }));
-app.use(cors());
+app.use(cors({
+    origin: "http://localhost:4200",
+    credentials: true
+}));
 app.use(session({
     secret: 'RACUN',
     resave: false,
     saveUninitialized: true
 }));
-configureAuthModule(app);
 app.use(passport.initialize());
 app.use(passport.session());
+configureAuthModule(app);
 app.listen(process.env.SERVER_PORT, function () {
     console.log("Server listening on ".concat(process.env.SERVER_PORT));
 });

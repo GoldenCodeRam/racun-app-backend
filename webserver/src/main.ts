@@ -16,7 +16,10 @@ app.use(urlencoded({
     extended: true,
 }));
 
-app.use(cors());
+app.use(cors({
+    origin: "http://localhost:4200",
+    credentials: true,
+}));
 
 app.use(
     session({
@@ -26,10 +29,11 @@ app.use(
     })
 );
 
-configureAuthModule(app);
-
 app.use(passport.initialize());
 app.use(passport.session());
+
+configureAuthModule(app);
+
 
 app.listen(process.env.SERVER_PORT, () => {
     console.log(`Server listening on ${process.env.SERVER_PORT}`);

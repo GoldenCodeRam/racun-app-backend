@@ -35,13 +35,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 import { PrismaClient } from "@prisma/client";
+var prisma = global.prisma || new PrismaClient();
 export function withPrismaClient(callback) {
     return __awaiter(this, void 0, void 0, function () {
-        var prisma;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    prisma = new PrismaClient();
+                    prisma.$connect();
                     return [4 /*yield*/, callback(prisma)];
                 case 1:
                     _a.sent();
