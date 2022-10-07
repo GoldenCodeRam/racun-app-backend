@@ -34,67 +34,21 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-import { faker } from "@faker-js/faker";
 import { PrismaClient } from "@prisma/client";
-import { genSaltSync, hashSync } from "bcrypt";
-var prisma = new PrismaClient();
-function main() {
+export function withPrismaClient(callback) {
     return __awaiter(this, void 0, void 0, function () {
-        var i;
+        var prisma;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, prisma.user.upsert({
-                        where: { email: 'admin@admin.com' },
-                        update: {},
-                        create: {
-                            email: "admin@admin.com",
-                            first_name: faker.name.firstName(),
-                            last_name: faker.name.lastName(),
-                            password: hashSync("admin", genSaltSync(10))
-                        }
-                    })];
+                case 0:
+                    prisma = new PrismaClient();
+                    return [4 /*yield*/, callback(prisma)];
                 case 1:
                     _a.sent();
-                    i = 0;
-                    _a.label = 2;
-                case 2:
-                    if (!(i < 10)) return [3 /*break*/, 5];
-                    return [4 /*yield*/, prisma.place.create({
-                            data: {
-                                name: faker.address.cityName()
-                            }
-                        })];
-                case 3:
-                    _a.sent();
-                    _a.label = 4;
-                case 4:
-                    i++;
-                    return [3 /*break*/, 2];
-                case 5: return [2 /*return*/];
+                    prisma.$disconnect();
+                    return [2 /*return*/];
             }
         });
     });
 }
-main().then(function () { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, prisma.$disconnect()];
-            case 1:
-                _a.sent();
-                return [2 /*return*/];
-        }
-    });
-}); })["catch"](function (error) { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                console.log(error);
-                return [4 /*yield*/, prisma.$disconnect()];
-            case 1:
-                _a.sent();
-                process.exit();
-                return [2 /*return*/];
-        }
-    });
-}); });
-//# sourceMappingURL=seed.js.map
+//# sourceMappingURL=database.js.map
