@@ -16,7 +16,7 @@
     "seed": "ts-node-esm prisma/seed.ts"
   },
   "scripts": {
-    "start": "tsc && node ./out/main.js"
+    "start": "tsc && node ./dist/main.js"
   },
   "devDependencies": {
     "@faker-js/faker": "^7.5.0",
