@@ -1,6 +1,6 @@
 import { User } from "@prisma/client";
 import { compareSync } from "bcrypt";
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import passport from "passport";
 import { Strategy } from "passport-local";
 
@@ -36,7 +36,7 @@ passport.use(
                 }
             });
         }
-    ),
+    )
 );
 
 passport.serializeUser((user: any | User, done) => {
@@ -54,27 +54,33 @@ passport.deserializeUser(async (id: number, done) => {
     });
 });
 
+// This is a simple alternative to the authorize Middleware used by PassportJs
+// I couldn't make it work, so this is the solution. :/
+export function authorize(
+    request: Request,
+    response: Response,
+    next: NextFunction
+) {
+    if (request.user) {
+        next();
+    } else {
+        response.sendStatus(401);
+    }
+}
+
 export function configureAuthModule(app: any) {
     app.post(
-        '/login/password',
-        passport.authenticate('local', {
+        "/login/password",
+        passport.authenticate("local", {
             failureMessage: true,
             successMessage: true,
         }),
-        (request: Request, response: Response) => {
+        (_: Request, response: Response) => {
             response.sendStatus(200);
-        },
+        }
     );
 
-    app.get(
-        '/auth/canActivate',
-        (request: Request, response: Response) => {
-            console.log(request.user);
-            if (request.user) {
-                response.sendStatus(200);
-            } else {
-                response.sendStatus(401);
-            }
-        },
+    app.get("/auth/canActivate", authorize, (_: Request, response: Response) =>
+        response.sendStatus(200)
     );
 }

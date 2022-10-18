@@ -4,6 +4,7 @@ import { configureAuthModule } from "./routes/auth.js";
 import passport from "passport";
 import session from "express-session";
 import cors from "cors";
+import { configureApiModule } from "./routes/api.js";
 
 dotenv.config();
 
@@ -33,7 +34,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 configureAuthModule(app);
-
+configureApiModule(app);
 
 app.listen(process.env.SERVER_PORT, () => {
     console.log(`Server listening on ${process.env.SERVER_PORT}`);

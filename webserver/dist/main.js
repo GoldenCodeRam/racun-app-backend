@@ -4,6 +4,7 @@ import { configureAuthModule } from "./routes/auth.js";
 import passport from "passport";
 import session from "express-session";
 import cors from "cors";
+import { configureApiModule } from "./routes/api.js";
 dotenv.config();
 var app = express();
 // This is so the app can handle JSON requests in the body.
@@ -24,6 +25,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 configureAuthModule(app);
+configureApiModule(app);
 app.listen(process.env.SERVER_PORT, function () {
     console.log("Server listening on ".concat(process.env.SERVER_PORT));
 });

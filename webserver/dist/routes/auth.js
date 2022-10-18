@@ -98,21 +98,25 @@ passport.deserializeUser(function (id, done) { return __awaiter(void 0, void 0, 
         return [2 /*return*/];
     });
 }); });
+// This is a simple alternative to the authorize Middleware used by PassportJs
+// I couldn't make it work, so this is the solution. :/
+export function authorize(request, response, next) {
+    if (request.user) {
+        next();
+    }
+    else {
+        response.sendStatus(401);
+    }
+}
 export function configureAuthModule(app) {
-    app.post('/login/password', passport.authenticate('local', {
+    app.post("/login/password", passport.authenticate("local", {
         failureMessage: true,
         successMessage: true
-    }), function (request, response) {
+    }), function (_, response) {
         response.sendStatus(200);
     });
-    app.get('/auth/canActivate', function (request, response) {
-        console.log(request.user);
-        if (request.user) {
-            response.sendStatus(200);
-        }
-        else {
-            response.sendStatus(401);
-        }
+    app.get("/auth/canActivate", authorize, function (_, response) {
+        return response.sendStatus(200);
     });
 }
 //# sourceMappingURL=auth.js.map
