@@ -16,6 +16,30 @@ model User {
     lastName  String @db.VarChar(280)
     password  String
     email     String @unique @db.VarChar(280)
+
+    role          Role            @relation(fields: [roleId], references: [id])
+    roleId        Int
+    ActionOnUsers ActionOnUsers[]
+}
+
+model Role {
+    id                Int                 @id @default(autoincrement())
+    name              String              @db.VarChar(255)
+    User              User[]
+    PermissionOnRoles PermissionOnRoles[]
+}
+
+model Permission {
+    id                Int                 @id @default(autoincrement())
+    name              Int
+    PermissionOnRoles PermissionOnRoles[]
+}
+
+model Action {
+    id            Int             @id @default(autoincrement())
+    action        Int
+    entity        String
+    ActionOnUsers ActionOnUsers[]
 }
 
 model Place {
@@ -27,6 +51,7 @@ model Place {
     places        Place[] @relation("PlaceHierarchy")
 
     clientContracts ClientContract[]
+    Zone            Zone[]
 }
 
 model Service {
@@ -37,15 +62,14 @@ model Service {
 }
 
 model Client {
-    id                Int                 @id @default(autoincrement())
-    firstName         String              @db.VarChar(280)
-    lastName          String              @db.VarChar(280)
-    document          String              @db.VarChar(100)
-    phone             String              @db.VarChar(100)
-    address           String              @db.VarChar(255)
-    email             String?             @db.VarChar(255)
-    ClientAccount     ClientAccount?
-    HardwareOnClients HardwareOnClients[]
+    id            Int            @id @default(autoincrement())
+    firstName     String         @db.VarChar(280)
+    lastName      String         @db.VarChar(280)
+    document      String         @db.VarChar(100)
+    phone         String         @db.VarChar(100)
+    address       String         @db.VarChar(255)
+    email         String?        @db.VarChar(255)
+    ClientAccount ClientAccount?
 }
 
 model Hardware {
@@ -54,13 +78,71 @@ model Hardware {
     name              String              @db.VarChar(255)
     details           String?
     HardwareOnClients HardwareOnClients[]
+    HardwareOnZones   HardwareOnZones[]
+}
+
+model Zone {
+    id   Int    @id @default(autoincrement())
+    name String @db.VarChar(255)
+    code String @db.VarChar(255)
+
+    place           Place             @relation(fields: [placeId], references: [id])
+    placeId         Int
+    HardwareOnZones HardwareOnZones[]
+}
+
+model Invoice {
+    id             Int      @id @default(autoincrement())
+    generationDate DateTime
+    periodStart    DateTime
+    periodEnd      DateTime
+    paymentDate    DateTime
+    suspensionDate DateTime
+    value          Float
+    adjustment     Float
+    status         Int
+
+    contractId Int
+    contract   ClientContract @relation(fields: [contractId], references: [id])
+}
+
+// ============================ RELATION TABLES ===============================
+
+model PermissionOnRoles {
+    permission   Permission @relation(fields: [permissionId], references: [id])
+    permissionId Int
+
+    role   Role @relation(fields: [roleId], references: [id])
+    roleId Int
+
+    @@id([permissionId, roleId])
+}
+
+model ActionOnUsers {
+    action   Action @relation(fields: [actionId], references: [id])
+    actionId Int
+
+    user   User @relation(fields: [userId], references: [id])
+    userId Int
+
+    @@id([actionId, userId])
+}
+
+model HardwareOnZones {
+    hardware   Hardware @relation(fields: [hardwareId], references: [id])
+    hardwareId Int
+
+    zone   Zone @relation(fields: [zoneId], references: [id])
+    zoneId Int
+
+    @@id([hardwareId, zoneId])
 }
 
 model HardwareOnClients {
     hardware   Hardware @relation(fields: [hardwareId], references: [id])
     hardwareId Int
 
-    client          Client @relation(fields: [clientAccountId], references: [id])
+    clientAccount   ClientAccount @relation(fields: [clientAccountId], references: [id])
     clientAccountId Int
 
     @@id([hardwareId, clientAccountId])
@@ -70,9 +152,10 @@ model ClientAccount {
     id     Int @id @default(autoincrement())
     status Int
 
-    client          Client           @relation(fields: [clientId], references: [id])
-    clientId        Int              @unique
-    clientContracts ClientContract[]
+    client            Client              @relation(fields: [clientId], references: [id])
+    clientId          Int                 @unique
+    clientContracts   ClientContract[]
+    HardwareOnClients HardwareOnClients[]
 }
 
 model ClientContract {
@@ -90,19 +173,4 @@ model ClientContract {
     serviceId Int
     service   Service   @relation(fields: [serviceId], references: [id])
     invoices  Invoice[]
-}
-
-model Invoice {
-    id             Int      @id @default(autoincrement())
-    generationDate DateTime
-    periodStart    DateTime
-    periodEnd      DateTime
-    paymentDate    DateTime
-    suspensionDate DateTime
-    value          Float
-    adjustment     Float
-    status         Int
-
-    contractId Int
-    contract   ClientContract @relation(fields: [contractId], references: [id])
 }
