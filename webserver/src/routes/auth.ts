@@ -3,6 +3,7 @@ import { compareSync } from "bcrypt";
 import { NextFunction, Request, Response } from "express";
 import passport from "passport";
 import { Strategy } from "passport-local";
+import { canRoleExecuteMethod, getUserRolePermissionsOnAPI } from "../auth/permissions.js";
 
 import { withPrismaClient } from "../database/database.js";
 
@@ -63,6 +64,27 @@ export function authorize(
 ) {
     if (request.user) {
         next();
+    } else {
+        response.sendStatus(401);
+    }
+}
+
+export async function authorizeOnRole(
+    request: Request,
+    response: Response,
+    next: NextFunction
+) {
+    if (request.user) {
+        const permission = await getUserRolePermissionsOnAPI(
+            (request.user as User).id,
+            request.url
+        );
+
+        if (canRoleExecuteMethod(permission, request.method)) {
+            next();
+        } else {
+            response.sendStatus(401);
+        }
     } else {
         response.sendStatus(401);
     }

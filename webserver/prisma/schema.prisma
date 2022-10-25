@@ -23,16 +23,16 @@ model User {
 }
 
 model Role {
-    id                Int                 @id @default(autoincrement())
-    name              String              @db.VarChar(255)
-    User              User[]
-    PermissionOnRoles PermissionOnRoles[]
+    id          Int           @id @default(autoincrement())
+    name        String        @db.VarChar(255)
+    User        User[]
+    APIsOnRoles APIsOnRoles[]
 }
 
-model Permission {
-    id                Int                 @id @default(autoincrement())
-    name              Int
-    PermissionOnRoles PermissionOnRoles[]
+model API {
+    id          Int           @id @default(autoincrement())
+    route       String        @unique
+    APIsOnRoles APIsOnRoles[]
 }
 
 model Action {
@@ -108,14 +108,18 @@ model Invoice {
 
 // ============================ RELATION TABLES ===============================
 
-model PermissionOnRoles {
-    permission   Permission @relation(fields: [permissionId], references: [id])
-    permissionId Int
+model APIsOnRoles {
+    api   API @relation(fields: [apiId], references: [id])
+    apiId Int
 
     role   Role @relation(fields: [roleId], references: [id])
     roleId Int
 
-    @@id([permissionId, roleId])
+    get    Boolean @default(false)
+    post   Boolean @default(false)
+    delete Boolean @default(false)
+
+    @@id([apiId, roleId])
 }
 
 model ActionOnUsers {
