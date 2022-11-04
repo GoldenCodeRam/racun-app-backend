@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 import { DEFAULT_ROLES } from "../../src/model/role.js";
 import { RoleSeeder } from "./roleSeeder.js";
@@ -11,8 +11,8 @@ export class APIsOnRolesSeeder implements DefaultSeeder {
         // If the roles are not created yet.
         this.roleSeeder.seed(prisma);
 
-        for (const api of await prisma.aPI.findMany()) {
-            await prisma.aPIsOnRoles.create({
+        for (const api of await prisma.api.findMany()) {
+            await prisma.apisOnRoles.create({
                 data: {
                     apiId: api.id,
                     roleId: DEFAULT_ROLES.superAdmin.id,

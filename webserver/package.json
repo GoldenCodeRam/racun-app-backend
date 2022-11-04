@@ -19,7 +19,10 @@
     "seed": "ts-node-esm prisma/seed.ts"
   },
   "scripts": {
-    "start": "tsc && node ./dist/main.js"
+    "start": "tsc && node ./dist/main.js",
+    "dev": "tsc && dotenv -e .env.development -- node ./dist/main.js",
+    "migrate:development": "dotenv -e .env.development -- yarn prisma migrate dev --name development-changes",
+    "migrate:development:reset": "dotenv -e .env.development -- yarn prisma migrate reset --force"
   },
   "devDependencies": {
     "@faker-js/faker": "^7.5.0",

@@ -1,6 +1,7 @@
-import { APIsOnRoles, PrismaClient } from "@prisma/client";
+import { ApisOnRoles, PrismaClient } from "@prisma/client";
 
 import { withPrismaClient } from "../database/database.js";
+import { Method } from "../routes/apiRoutes.js";
 
 export interface Permission {
     hasGet(): boolean;
@@ -22,11 +23,15 @@ export class AllPermissions implements Permission {
     }
 }
 
+/**
+ * Use the user role, API route, to get the permissions the user has on that
+ * route. 
+ */
 export async function getUserRolePermissionsOnAPI(
     userId: number,
-    apiUrl: string
-) {
-    return await new Promise<APIsOnRoles>((resolve, _) => {
+    apiRoute: string,
+): Promise<ApisOnRoles> {
+    return await new Promise<ApisOnRoles>((resolve, _) => {
         withPrismaClient(async (prisma: PrismaClient) => {
             const validatedUser = await prisma.user.findUnique({
                 where: { id: userId },
@@ -34,11 +39,13 @@ export async function getUserRolePermissionsOnAPI(
                     role: true,
                 },
             });
-            const validatedAPI = await prisma.aPI.findUnique({
-                where: { route: apiUrl },
+            const validatedAPI = await prisma.api.findUnique({
+                where: {
+                    route: apiRoute,
+                },
             });
 
-            const result = await prisma.aPIsOnRoles.findUnique({
+            const result = await prisma.apisOnRoles.findUnique({
                 where: {
                     apiId_roleId: {
                         apiId: validatedAPI!.id,
@@ -54,7 +61,7 @@ export async function getUserRolePermissionsOnAPI(
 }
 
 export function canRoleExecuteMethod(
-    permission: APIsOnRoles,
+    permission: ApisOnRoles,
     request: string
 ): boolean {
     switch (request) {

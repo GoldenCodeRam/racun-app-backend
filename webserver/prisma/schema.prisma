@@ -26,13 +26,13 @@ model Role {
     id          Int           @id @default(autoincrement())
     name        String        @db.VarChar(255)
     User        User[]
-    APIsOnRoles APIsOnRoles[]
+    ApisOnRoles ApisOnRoles[]
 }
 
-model API {
+model Api {
     id          Int           @id @default(autoincrement())
     route       String        @unique
-    APIsOnRoles APIsOnRoles[]
+    ApisOnRoles ApisOnRoles[]
 }
 
 model Action {
@@ -108,8 +108,8 @@ model Invoice {
 
 // ============================ RELATION TABLES ===============================
 
-model APIsOnRoles {
-    api   API @relation(fields: [apiId], references: [id])
+model ApisOnRoles {
+    api   Api @relation(fields: [apiId], references: [id])
     apiId Int
 
     role   Role @relation(fields: [roleId], references: [id])

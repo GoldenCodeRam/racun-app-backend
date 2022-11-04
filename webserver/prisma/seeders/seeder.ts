@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { APISeeder } from "./apiSeeder.js";
+import { ApiSeeder } from "./apiSeeder.js";
 import { APIsOnRolesSeeder } from "./apisOnRolesSeeder.js";
 import { CitySeeder } from "./citySeeder.js";
 import { ClientSeeder } from "./clientSeeder.js";
@@ -20,7 +20,7 @@ export class Seeder {
         new CitySeeder(),
         new UserSeeder(new RoleSeeder()),
         new HardwareSeeder(),
-        new APISeeder(),
+        new ApiSeeder(),
         new APIsOnRolesSeeder(new RoleSeeder()),
     ];
 

@@ -1,13 +1,13 @@
 import { PrismaClient } from "@prisma/client";
 import { DefaultSeeder } from "./seeder";
-import { API_ROUTES } from "../../src/routes/apiRoutes.js";
+import { API_ROUTES, Method } from "../../src/routes/apiRoutes.js";
 
-export class APISeeder implements DefaultSeeder {
+export class ApiSeeder implements DefaultSeeder {
     async seed(prisma: PrismaClient) {
-        for (const route of API_ROUTES) {
-            await prisma.aPI.create({
+        for (const apiRoute of Object.values(API_ROUTES)) {
+            await prisma.api.create({
                 data: {
-                    route: route,
+                    route: apiRoute,
                 },
             });
         }

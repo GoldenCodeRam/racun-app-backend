@@ -6,6 +6,7 @@ import { Strategy } from "passport-local";
 import { canRoleExecuteMethod, getUserRolePermissionsOnAPI } from "../auth/permissions.js";
 
 import { withPrismaClient } from "../database/database.js";
+import { getMethodFromString, Method } from "./apiRoutes.js";
 
 passport.use(
     "local",
@@ -77,7 +78,8 @@ export async function authorizeOnRole(
     if (request.user) {
         const permission = await getUserRolePermissionsOnAPI(
             (request.user as User).id,
-            request.url
+            // This is needed so the arguments, queries and such, don't kill this.
+            request.route.path,
         );
 
         if (canRoleExecuteMethod(permission, request.method)) {

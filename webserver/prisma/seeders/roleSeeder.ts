@@ -9,7 +9,6 @@ export class RoleSeeder implements DefaultSeeder {
                 where: { id: role.id },
                 update: {},
                 create: {
-                    id: role.id,
                     name: role.name,
                 },
             });

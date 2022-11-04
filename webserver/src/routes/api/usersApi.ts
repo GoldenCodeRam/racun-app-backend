@@ -4,40 +4,38 @@ import { withPrismaClient } from "../../database/database.js";
 import { API_ROUTES } from "../apiRoutes.js";
 import { authorize, authorizeOnRole } from "../auth.js";
 
-export function createClientsApi(app: any) {
+export function createUsersApi(app: any) {
     app.get(
-        API_ROUTES.clients,
+        API_ROUTES.currentUser,
         authorize,
         authorizeOnRole,
         async (request: Request, response: Response) => {
-            withPrismaClient(async (prisma) => {
-                response.send(await prisma.client.findMany());
-            });
+            response.send(request.user);
         }
     );
 
     app.get(
-        API_ROUTES.getClient,
+        API_ROUTES.getUser,
         authorize,
         authorizeOnRole,
         async (request: Request, response: Response) => {
             withPrismaClient(async (prisma) => {
-                const clientId = request.params["clientId"];
-                const client = await prisma.client.findUnique({
+                const userId = request.params["userId"];
+                const user = await prisma.user.findUnique({
                     where: {
-                        id: parseInt(clientId),
+                        id: parseInt(userId),
+                    },
+                    include: {
+                        role: true,
                     },
                 });
-                response.send(client);
+                response.send(user);
             });
         }
     );
 
-    /**
-     * Get clients with a search and pagination.
-     */
     app.post(
-        API_ROUTES.clients,
+        API_ROUTES.users,
         authorize,
         authorizeOnRole,
         async (request: Request, response: Response) => {
@@ -56,41 +54,45 @@ export function createClientsApi(app: any) {
                             },
                         },
                         {
-                            document: {
+                            email: {
                                 contains: query.userSearch,
                             },
                         },
                     ],
                 };
 
-                let clients;
-                let clientCount;
-
-                // TODO: Refactor this method as is the same from the usersApi.
+                let users;
+                let userCount;
 
                 // TODO: We should move this logic elsewhere.
                 // This is not too good as we are mixing API functions and search
                 // in the database. But for now is good.
                 if (query.userSearch?.length > 0) {
-                    clientCount = await prisma.client.count({
+                    userCount = await prisma.user.count({
                         where: whereQuery,
                     });
-                    clients = await prisma.client.findMany({
+                    users = await prisma.user.findMany({
                         where: whereQuery,
+                        include: {
+                            role: true,
+                        },
                         skip: query.skip,
                         take: query.take,
                     });
                 } else {
-                    clientCount = await prisma.client.count();
-                    clients = await prisma.client.findMany({
+                    userCount = await prisma.user.count();
+                    users = await prisma.user.findMany({
+                        include: {
+                            role: true,
+                        },
                         skip: query.skip,
                         take: query.take,
                     });
                 }
 
                 response.send({
-                    search: clients,
-                    searchCount: clientCount,
+                    search: users,
+                    searchCount: userCount,
                 });
             });
         }
