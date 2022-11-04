@@ -25,9 +25,18 @@ export function getMethodFromString(str: string): Method {
 export const API_ROUTES = {
     clients: "/api/clients",
     getClient: "/api/clients/:clientId",
+
     roles: "/api/roles",
+
+    zones: "/api/zones",
+    getZone: "/api/zones/:zoneId",
+
     permissions: "/api/permissions",
     permissionsRoleId: "/api/permissions/:roleId",
+
+    hardware: "/api/hardware",
+    getHardware: "/api/hardware/:hardwareId",
+
     users: "/api/users",
     getUser: "/api/users/:userId",
 

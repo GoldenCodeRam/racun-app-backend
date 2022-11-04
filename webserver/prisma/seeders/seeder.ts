@@ -4,8 +4,10 @@ import { APIsOnRolesSeeder } from "./apisOnRolesSeeder.js";
 import { CitySeeder } from "./citySeeder.js";
 import { ClientSeeder } from "./clientSeeder.js";
 import { HardwareSeeder } from "./hardwareSeeder.js";
+import { PlaceSeeder } from "./placeSeeder.js";
 import { RoleSeeder } from "./roleSeeder.js";
 import { UserSeeder } from "./userSeeder.js";
+import { ZoneSeeder } from "./zoneSeeder.js";
 
 export interface DefaultSeeder {
     seed(prisma: PrismaClient): Promise<void>;
@@ -22,6 +24,7 @@ export class Seeder {
         new HardwareSeeder(),
         new ApiSeeder(),
         new APIsOnRolesSeeder(new RoleSeeder()),
+        new ZoneSeeder(new PlaceSeeder()),
     ];
 
     public async runAllSeeders() {
