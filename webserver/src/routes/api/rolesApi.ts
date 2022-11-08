@@ -7,7 +7,7 @@ import { authorize, authorizeOnRole } from "../auth.js";
 
 export function createRolesApi(app: any) {
     app.post(
-        API_ROUTES.roles,
+        API_ROUTES.createRole,
         authorize,
         authorizeOnRole,
         async (request: Request, response: Response) => {
@@ -34,6 +34,54 @@ export function createRolesApi(app: any) {
                 }
 
                 response.sendStatus(200);
+            });
+        }
+    );
+
+    app.post(
+        API_ROUTES.roles,
+        authorize,
+        authorizeOnRole,
+        async (request: Request, response: Response) => {
+            withPrismaClient(async (prisma) => {
+                const query = request.body;
+                const whereQuery = {
+                    OR: [
+                        {
+                            name: {
+                                contains: query.userSearch,
+                            },
+                        },
+                    ],
+                };
+
+                let roles;
+                let roleCount;
+
+                // TODO: We should move this logic elsewhere.
+                // This is not too good as we are mixing API functions and search
+                // in the database. But for now is good.
+                if (query.userSearch?.length > 0) {
+                    roleCount = await prisma.role.count({
+                        where: whereQuery,
+                    });
+                    roles = await prisma.role.findMany({
+                        where: whereQuery,
+                        skip: query.skip,
+                        take: query.take,
+                    });
+                } else {
+                    roleCount = await prisma.role.count();
+                    roles = await prisma.role.findMany({
+                        skip: query.skip,
+                        take: query.take,
+                    });
+                }
+
+                response.send({
+                    search: roles,
+                    searchCount: roleCount,
+                });
             });
         }
     );

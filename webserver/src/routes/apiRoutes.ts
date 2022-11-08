@@ -27,6 +27,7 @@ export const API_ROUTES = {
     getClient: "/api/clients/:clientId",
 
     roles: "/api/roles",
+    createRole: "/api/roles/create",
 
     zones: "/api/zones",
     getZone: "/api/zones/:zoneId",
