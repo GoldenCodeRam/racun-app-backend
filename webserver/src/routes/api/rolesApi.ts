@@ -87,6 +87,23 @@ export function createRolesApi(app: any) {
     );
 
     app.get(
+        API_ROUTES.getRole,
+        authorize,
+        authorizeOnRole,
+        async (request: Request, response: Response) => {
+            withPrismaClient(async (prisma) => {
+                const roleId = request.params["roleId"];
+                const role = await prisma.role.findUnique({
+                    where: {
+                        id: parseInt(roleId),
+                    },
+                });
+                response.send(role);
+            });
+        }
+    );
+
+    app.get(
         API_ROUTES.roles,
         authorize,
         authorizeOnRole,

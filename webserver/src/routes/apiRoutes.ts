@@ -28,6 +28,7 @@ export const API_ROUTES = {
 
     roles: "/api/roles",
     createRole: "/api/roles/create",
+    getRole: "/api/roles/:roleId",
 
     zones: "/api/zones",
     getZone: "/api/zones/:zoneId",
