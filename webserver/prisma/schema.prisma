@@ -2,179 +2,173 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-    id        Int    @id @default(autoincrement())
-    firstName String @db.VarChar(280)
-    lastName  String @db.VarChar(280)
-    password  String
-    email     String @unique @db.VarChar(280)
+  id        Int    @id @default(autoincrement())
+  firstName String @db.VarChar(280)
+  lastName  String @db.VarChar(280)
+  password  String
+  email     String @unique @db.VarChar(280)
 
-    role          Role            @relation(fields: [roleId], references: [id])
-    roleId        Int
-    ActionOnUsers ActionOnUsers[]
+  role   Role     @relation(fields: [roleId], references: [id])
+  roleId Int
+  
+  Action Action[]
 }
 
 model Role {
-    id          Int           @id @default(autoincrement())
-    name        String        @db.VarChar(255)
-    User        User[]
-    ApisOnRoles ApisOnRoles[]
+  id          Int           @id @default(autoincrement())
+  name        String        @db.VarChar(255)
+  User        User[]
+  ApisOnRoles ApisOnRoles[]
 }
 
 model Api {
-    id          Int           @id @default(autoincrement())
-    route       String        @unique
-    ApisOnRoles ApisOnRoles[]
+  id          Int           @id @default(autoincrement())
+  route       String        @unique
+  ApisOnRoles ApisOnRoles[]
 }
 
 model Action {
-    id            Int             @id @default(autoincrement())
-    action        Int
-    entity        String
-    ActionOnUsers ActionOnUsers[]
+  id     Int      @id @default(autoincrement())
+  method String
+  url    String
+  date   DateTime
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
 }
 
 model Place {
-    id   Int    @id @default(autoincrement())
-    name String @db.VarChar(255)
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(255)
 
-    parentPlaceId Int?
-    parentPlace   Place?  @relation("PlaceHierarchy", fields: [parentPlaceId], references: [id])
-    places        Place[] @relation("PlaceHierarchy")
+  parentPlaceId Int?
+  parentPlace   Place?  @relation("PlaceHierarchy", fields: [parentPlaceId], references: [id])
+  places        Place[] @relation("PlaceHierarchy")
 
-    clientContracts ClientContract[]
-    Zone            Zone[]
+  clientContracts ClientContract[]
+  Zone            Zone[]
 }
 
 model Service {
-    id              Int              @id @default(autoincrement())
-    name            String           @db.VarChar(255)
-    description     String
-    clientContracts ClientContract[]
+  id              Int              @id @default(autoincrement())
+  name            String           @db.VarChar(255)
+  description     String
+  clientContracts ClientContract[]
 }
 
 model Client {
-    id            Int            @id @default(autoincrement())
-    firstName     String         @db.VarChar(280)
-    lastName      String         @db.VarChar(280)
-    document      String         @db.VarChar(100)
-    phone         String         @db.VarChar(100)
-    address       String         @db.VarChar(255)
-    email         String?        @db.VarChar(255)
-    ClientAccount ClientAccount?
+  id            Int            @id @default(autoincrement())
+  firstName     String         @db.VarChar(280)
+  lastName      String         @db.VarChar(280)
+  document      String         @db.VarChar(100)
+  phone         String         @db.VarChar(100)
+  address       String         @db.VarChar(255)
+  email         String?        @db.VarChar(255)
+  ClientAccount ClientAccount?
 }
 
 model Hardware {
-    id                Int                 @id @default(autoincrement())
-    model             String              @db.VarChar(255)
-    name              String              @db.VarChar(255)
-    details           String?
-    HardwareOnClients HardwareOnClients[]
-    HardwareOnZones   HardwareOnZones[]
+  id                Int                 @id @default(autoincrement())
+  model             String              @db.VarChar(255)
+  name              String              @db.VarChar(255)
+  details           String?
+  HardwareOnClients HardwareOnClients[]
+  HardwareOnZones   HardwareOnZones[]
 }
 
 model Zone {
-    id   Int    @id @default(autoincrement())
-    name String @db.VarChar(255)
-    code String @db.VarChar(255)
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(255)
+  code String @db.VarChar(255)
 
-    place           Place             @relation(fields: [placeId], references: [id])
-    placeId         Int
-    HardwareOnZones HardwareOnZones[]
+  place           Place             @relation(fields: [placeId], references: [id])
+  placeId         Int
+  HardwareOnZones HardwareOnZones[]
 }
 
 model Invoice {
-    id             Int      @id @default(autoincrement())
-    generationDate DateTime
-    periodStart    DateTime
-    periodEnd      DateTime
-    paymentDate    DateTime
-    suspensionDate DateTime
-    value          Float
-    adjustment     Float
-    status         Int
+  id             Int      @id @default(autoincrement())
+  generationDate DateTime
+  periodStart    DateTime
+  periodEnd      DateTime
+  paymentDate    DateTime
+  suspensionDate DateTime
+  value          Float
+  adjustment     Float
+  status         Int
 
-    contractId Int
-    contract   ClientContract @relation(fields: [contractId], references: [id])
+  contractId Int
+  contract   ClientContract @relation(fields: [contractId], references: [id])
 }
 
 // ============================ RELATION TABLES ===============================
 
 model ApisOnRoles {
-    api   Api @relation(fields: [apiId], references: [id])
-    apiId Int
+  api   Api @relation(fields: [apiId], references: [id])
+  apiId Int
 
-    role   Role @relation(fields: [roleId], references: [id])
-    roleId Int
+  role   Role @relation(fields: [roleId], references: [id])
+  roleId Int
 
-    get    Boolean @default(false)
-    post   Boolean @default(false)
-    delete Boolean @default(false)
+  get    Boolean @default(false)
+  post   Boolean @default(false)
+  delete Boolean @default(false)
 
-    @@id([apiId, roleId])
-}
-
-model ActionOnUsers {
-    action   Action @relation(fields: [actionId], references: [id])
-    actionId Int
-
-    user   User @relation(fields: [userId], references: [id])
-    userId Int
-
-    @@id([actionId, userId])
+  @@id([apiId, roleId])
 }
 
 model HardwareOnZones {
-    hardware   Hardware @relation(fields: [hardwareId], references: [id])
-    hardwareId Int
+  hardware   Hardware @relation(fields: [hardwareId], references: [id])
+  hardwareId Int
 
-    zone   Zone @relation(fields: [zoneId], references: [id])
-    zoneId Int
+  zone   Zone @relation(fields: [zoneId], references: [id])
+  zoneId Int
 
-    @@id([hardwareId, zoneId])
+  @@id([hardwareId, zoneId])
 }
 
 model HardwareOnClients {
-    hardware   Hardware @relation(fields: [hardwareId], references: [id])
-    hardwareId Int
+  hardware   Hardware @relation(fields: [hardwareId], references: [id])
+  hardwareId Int
 
-    clientAccount   ClientAccount @relation(fields: [clientAccountId], references: [id])
-    clientAccountId Int
+  clientAccount   ClientAccount @relation(fields: [clientAccountId], references: [id])
+  clientAccountId Int
 
-    @@id([hardwareId, clientAccountId])
+  @@id([hardwareId, clientAccountId])
 }
 
 model ClientAccount {
-    id     Int @id @default(autoincrement())
-    status Int
+  id     Int @id @default(autoincrement())
+  status Int
 
-    client            Client              @relation(fields: [clientId], references: [id])
-    clientId          Int                 @unique
-    clientContracts   ClientContract[]
-    HardwareOnClients HardwareOnClients[]
+  client            Client              @relation(fields: [clientId], references: [id])
+  clientId          Int                 @unique
+  clientContracts   ClientContract[]
+  HardwareOnClients HardwareOnClients[]
 }
 
 model ClientContract {
-    id        Int      @id @default(autoincrement())
-    value     Float
-    status    Int
-    dateStart DateTime
+  id        Int      @id @default(autoincrement())
+  value     Float
+  status    Int
+  dateStart DateTime
 
-    clientAccountId Int
-    clientAccount   ClientAccount @relation(fields: [clientAccountId], references: [id])
+  clientAccountId Int
+  clientAccount   ClientAccount @relation(fields: [clientAccountId], references: [id])
 
-    placeId Int
-    place   Place @relation(fields: [placeId], references: [id])
+  placeId Int
+  place   Place @relation(fields: [placeId], references: [id])
 
-    serviceId Int
-    service   Service   @relation(fields: [serviceId], references: [id])
-    invoices  Invoice[]
+  serviceId Int
+  service   Service   @relation(fields: [serviceId], references: [id])
+  invoices  Invoice[]
 }

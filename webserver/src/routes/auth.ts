@@ -6,7 +6,6 @@ import { Strategy } from "passport-local";
 import { canRoleExecuteMethod, getUserRolePermissionsOnAPI } from "../auth/permissions.js";
 
 import { withPrismaClient } from "../database/database.js";
-import { getMethodFromString, Method } from "./apiRoutes.js";
 
 passport.use(
     "local",

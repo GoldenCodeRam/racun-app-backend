@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { logMotion } from "../../audit/audit.js";
 
 import { withPrismaClient } from "../../database/database.js";
 import { DEFAULT_ROLES } from "../../model/role.js";
@@ -10,6 +11,7 @@ export function createRolesApi(app: any) {
         API_ROUTES.createRole,
         authorize,
         authorizeOnRole,
+        logMotion,
         async (request: Request, response: Response) => {
             withPrismaClient(async (prisma) => {
                 const role = await prisma.role.create({

@@ -8,20 +8,6 @@ export enum Method {
     DELETE,
 }
 
-export function getMethodFromString(str: string): Method {
-    const sanitizedString = str.toLowerCase();
-    switch (sanitizedString) {
-        case "get":
-            return Method.GET;
-        case "post":
-            return Method.POST;
-        case "delete":
-            return Method.DELETE;
-        default:
-            throw new Error("Method not defined!");
-    }
-}
-
 export const API_ROUTES = {
     clients: "/api/clients",
     getClient: "/api/clients/:clientId",
