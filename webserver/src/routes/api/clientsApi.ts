@@ -6,7 +6,7 @@ import { authorize, authorizeOnRole } from "../auth.js";
 
 export function createClientsApi(app: any) {
     app.get(
-        API_ROUTES.clients,
+        API_ROUTES.clients.clients,
         authorize,
         authorizeOnRole,
         async (request: Request, response: Response) => {
@@ -17,7 +17,18 @@ export function createClientsApi(app: any) {
     );
 
     app.get(
-        API_ROUTES.getClient,
+        API_ROUTES.clients.count,
+        authorize,
+        authorizeOnRole,
+        async (request: Request, response: Response) => {
+            withPrismaClient(async (prisma) => {
+                response.send(await prisma.client.count());
+            });
+        }
+    );
+
+    app.get(
+        API_ROUTES.clients.getClient,
         authorize,
         authorizeOnRole,
         async (request: Request, response: Response) => {
@@ -37,7 +48,7 @@ export function createClientsApi(app: any) {
      * Get clients with a search and pagination.
      */
     app.post(
-        API_ROUTES.clients,
+        API_ROUTES.clients.clients,
         authorize,
         authorizeOnRole,
         async (request: Request, response: Response) => {

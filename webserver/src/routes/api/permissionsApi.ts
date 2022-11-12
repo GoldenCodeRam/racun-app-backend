@@ -6,7 +6,7 @@ import { authorize, authorizeOnRole } from "../auth.js";
 
 export function createPermissionsApi(app: any) {
     app.get(
-        `${API_ROUTES.permissionsRoleId}`,
+        `${API_ROUTES.permissions.permissionsRoleId}`,
         authorize,
         authorizeOnRole,
         async (request: Request, response: Response) => {

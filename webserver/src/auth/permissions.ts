@@ -1,7 +1,7 @@
-import { ApisOnRoles, PrismaClient } from "@prisma/client";
+import { ApisOnRoles } from "@prisma/client";
 
-import { withPrismaClient } from "../database/database.js";
-import { Method } from "../routes/apiRoutes.js";
+import { ApiDatabase } from "../database/apiDatabase.js";
+import { UserDatabase } from "../database/userDatabase.js";
 
 export interface Permission {
     hasGet(): boolean;
@@ -25,39 +25,23 @@ export class AllPermissions implements Permission {
 
 /**
  * Use the user role, API route, to get the permissions the user has on that
- * route. 
+ * route.
  */
 export async function getUserRolePermissionsOnAPI(
     userId: number,
-    apiRoute: string,
-): Promise<ApisOnRoles> {
-    return await new Promise<ApisOnRoles>((resolve, _) => {
-        withPrismaClient(async (prisma: PrismaClient) => {
-            const validatedUser = await prisma.user.findUnique({
-                where: { id: userId },
-                include: {
-                    role: true,
-                },
-            });
-            const validatedAPI = await prisma.api.findUnique({
-                where: {
-                    route: apiRoute,
-                },
-            });
+    apiName: string
+): Promise<ApisOnRoles | null> {
+    const validatedUser = await UserDatabase.getUserById(userId);
+    const validatedApi = await ApiDatabase.getApi(apiName);
 
-            const result = await prisma.apisOnRoles.findUnique({
-                where: {
-                    apiId_roleId: {
-                        apiId: validatedAPI!.id,
-                        roleId: validatedUser!.role.id,
-                    },
-                },
-            });
-            if (result) {
-                resolve(result);
-            }
-        });
-    });
+    if (validatedUser && validatedApi) {
+        return await ApiDatabase.getApisOnRoles(
+            validatedUser.id,
+            validatedApi.id
+        );
+    } else {
+        return null;
+    }
 }
 
 export function canRoleExecuteMethod(
@@ -68,6 +52,12 @@ export function canRoleExecuteMethod(
         case "GET":
             return permission.get;
         case "POST":
+            return permission.post;
+        case "PUT":
+            // FIXME: This PUT case is very important, we could just add another value
+            // to the model and database, but for the moment we need to have this
+            // working. So if the user can post, it means that it can also update
+            // values.
             return permission.post;
         case "DELETE":
             return permission.delete;

@@ -6,12 +6,24 @@ declare global {
 
 const prisma = global.prisma || new PrismaClient();
 
-export async function withPrismaClient(
-    callback: (prisma: PrismaClient) => Promise<void>
-): Promise<void> {
-    prisma.$connect();
-    await callback(prisma);
-    prisma.$disconnect();
+// This constant will determine the amount of searches made in the database. This
+// should be used for every API where you want to make a search, so by default
+// we will search SEARCH_AMOUNT elements in the database at max.
+//
+// This is only a recomended amount, you can use the value you want, if the API
+// needs a bigger or lower default.
+export const SEARCH_AMOUNT = 30;
 
-    return;
+export async function withPrismaClient<T>(
+    callback: (prisma: PrismaClient) => Promise<T>
+): Promise<T> {
+    await prisma.$connect();
+    const result = await callback(prisma);
+    await prisma.$disconnect();
+
+    return result;
+}
+export interface SearchResult<T> {
+    search: T[];
+    searchCount: number;
 }

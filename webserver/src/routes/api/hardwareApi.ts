@@ -6,7 +6,7 @@ import { authorize, authorizeOnRole } from "../auth.js";
 
 export function createHardwareApi(app: any) {
     app.get(
-        API_ROUTES.getHardware,
+        API_ROUTES.hardware.getHardware,
         authorize,
         authorizeOnRole,
         async (request: Request, response: Response) => {
@@ -23,7 +23,7 @@ export function createHardwareApi(app: any) {
     );
 
     app.post(
-        API_ROUTES.hardware,
+        API_ROUTES.hardware.hardware,
         authorize,
         authorizeOnRole,
         async (request: Request, response: Response) => {

@@ -8,7 +8,7 @@ import { authorize, authorizeOnRole } from "../auth.js";
 
 export function createRolesApi(app: any) {
     app.post(
-        API_ROUTES.createRole,
+        API_ROUTES.roles.createRole,
         authorize,
         authorizeOnRole,
         logMotion,
@@ -41,7 +41,7 @@ export function createRolesApi(app: any) {
     );
 
     app.post(
-        API_ROUTES.roles,
+        API_ROUTES.roles.roles,
         authorize,
         authorizeOnRole,
         async (request: Request, response: Response) => {
@@ -89,7 +89,7 @@ export function createRolesApi(app: any) {
     );
 
     app.get(
-        API_ROUTES.getRole,
+        API_ROUTES.roles.roleId,
         authorize,
         authorizeOnRole,
         async (request: Request, response: Response) => {
@@ -106,7 +106,7 @@ export function createRolesApi(app: any) {
     );
 
     app.get(
-        API_ROUTES.roles,
+        API_ROUTES.roles.roles,
         authorize,
         authorizeOnRole,
         async (request: Request, response: Response) => {

@@ -11,7 +11,7 @@ export class UserSeeder implements DefaultSeeder {
 
     async seed(prisma: PrismaClient) {
         // Seed the roles first, so the users can use them
-        this.roleSeeder.seed(prisma);
+        await this.roleSeeder.seed(prisma);
 
         await prisma.user.upsert({
             where: { email: "admin@admin.com" },

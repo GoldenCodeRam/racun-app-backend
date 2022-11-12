@@ -1,100 +1,63 @@
 import { Request, Response } from "express";
-
-import { withPrismaClient } from "../../database/database.js";
+import { logMotion } from "../../audit/audit.js";
+import { UserDatabase } from "../../database/userDatabase.js";
+import { ApiEndpoint } from "../apiEndpoint.js";
 import { API_ROUTES } from "../apiRoutes.js";
 import { authorize, authorizeOnRole } from "../auth.js";
 
-export function createUsersApi(app: any) {
-    app.get(
-        API_ROUTES.currentUser,
-        authorize,
-        authorizeOnRole,
-        async (request: Request, response: Response) => {
-            response.send(request.user);
-        }
-    );
+export class UsersApiEndpoint extends ApiEndpoint {
+    constructor() {
+        super("users");
+    }
 
-    app.get(
-        API_ROUTES.getUser,
-        authorize,
-        authorizeOnRole,
-        async (request: Request, response: Response) => {
-            withPrismaClient(async (prisma) => {
-                const userId = request.params["userId"];
-                const user = await prisma.user.findUnique({
-                    where: {
-                        id: parseInt(userId),
-                    },
-                    include: {
-                        role: true,
-                    },
-                });
-                response.send(user);
-            });
-        }
-    );
+    public registerMethods(app: any): void {
+        app.get(
+            this.getUrlWithExtension("current-user"),
+            authorize,
+            authorizeOnRole,
+            async (request: Request, response: Response) => {
+                response.send(request.user);
+            }
+        );
 
-    app.post(
-        API_ROUTES.users,
-        authorize,
-        authorizeOnRole,
-        async (request: Request, response: Response) => {
-            withPrismaClient(async (prisma) => {
-                const query = request.body;
-                const whereQuery = {
-                    OR: [
-                        {
-                            firstName: {
-                                contains: query.userSearch,
-                            },
-                        },
-                        {
-                            lastName: {
-                                contains: query.userSearch,
-                            },
-                        },
-                        {
-                            email: {
-                                contains: query.userSearch,
-                            },
-                        },
-                    ],
-                };
+        app.get(
+            this.getUrlWithExtension(":userId"),
+            authorize,
+            authorizeOnRole,
+            async (request: Request, response: Response) => {
+                const userId = parseInt(request.params["userId"]);
+                const result = await UserDatabase.getUserById(userId);
+                response.send(result);
+            }
+        );
 
-                let users;
-                let userCount;
+        app.post(
+            this.getUrl(),
+            authorize,
+            authorizeOnRole,
+            async (request: Request, response: Response) => {
+                const search = request.body.userSearch;
+                const skip = request.body.skip;
+                const take = request.body.take;
 
-                // TODO: We should move this logic elsewhere.
-                // This is not too good as we are mixing API functions and search
-                // in the database. But for now is good.
-                if (query.userSearch?.length > 0) {
-                    userCount = await prisma.user.count({
-                        where: whereQuery,
-                    });
-                    users = await prisma.user.findMany({
-                        where: whereQuery,
-                        include: {
-                            role: true,
-                        },
-                        skip: query.skip,
-                        take: query.take,
-                    });
-                } else {
-                    userCount = await prisma.user.count();
-                    users = await prisma.user.findMany({
-                        include: {
-                            role: true,
-                        },
-                        skip: query.skip,
-                        take: query.take,
-                    });
-                }
+                const result = await UserDatabase.searchUser(
+                    search,
+                    skip,
+                    take
+                );
+                response.send(result);
+            }
+        );
 
-                response.send({
-                    search: users,
-                    searchCount: userCount,
-                });
-            });
-        }
-    );
+        app.put(
+            API_ROUTES.users.userId,
+            authorize,
+            authorizeOnRole,
+            logMotion,
+            async (request: Request, response: Response) => {
+                const result = await UserDatabase.updateUser(request.body);
+                response.send(result);
+            }
+        );
+    }
 }

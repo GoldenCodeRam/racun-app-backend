@@ -6,7 +6,7 @@ import { authorize, authorizeOnRole } from "../auth.js";
 
 export function createZonesApi(app: any) {
     app.get(
-        API_ROUTES.getZone,
+        API_ROUTES.zones.getZone,
         authorize,
         authorizeOnRole,
         async (request: Request, response: Response) => {
@@ -23,7 +23,7 @@ export function createZonesApi(app: any) {
     );
 
     app.post(
-        API_ROUTES.zones,
+        API_ROUTES.zones.zones,
         authorize,
         authorizeOnRole,
         async (request: Request, response: Response) => {

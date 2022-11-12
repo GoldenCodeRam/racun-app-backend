@@ -17,9 +17,9 @@ model User {
   password  String
   email     String @unique @db.VarChar(280)
 
-  role   Role     @relation(fields: [roleId], references: [id])
+  role   Role @relation(fields: [roleId], references: [id])
   roleId Int
-  
+
   Action Action[]
 }
 
@@ -32,7 +32,7 @@ model Role {
 
 model Api {
   id          Int           @id @default(autoincrement())
-  route       String        @unique
+  name        String        @unique
   ApisOnRoles ApisOnRoles[]
 }
 
