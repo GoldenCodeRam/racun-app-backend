@@ -26,7 +26,7 @@ export class UsersApiEndpoint extends ApiEndpoint {
             authorizeOnRole,
             async (request: Request, response: Response) => {
                 const userId = parseInt(request.params["userId"]);
-                const result = await UserDatabase.getUserById(userId);
+                const result = await UserDatabase.getUserById(userId, true);
                 response.send(result);
             }
         );
