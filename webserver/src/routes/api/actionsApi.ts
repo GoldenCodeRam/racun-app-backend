@@ -1,28 +1,15 @@
 import { Request, Response } from "express";
-
-import { withPrismaClient } from "../../database/database.js";
-import { ZoneDatabase } from "../../database/zoneDatabase.js";
+import { ActionDatabase } from "../../database/actionDatabase.js";
+import { UserDatabase } from "../../database/userDatabase.js";
 import { ApiEndpoint } from "../apiEndpoint.js";
 import { authorize, authorizeOnRole } from "../auth.js";
 
-export class ZonesApiEndpoint extends ApiEndpoint {
+export class ActionsApiEndpoint extends ApiEndpoint {
     constructor() {
-        super("zones");
+        super("actions");
     }
 
     public registerMethods(app: any): void {
-        app.get(
-            this.getUrlWithExtension(":zoneId"),
-            authorize,
-            authorizeOnRole,
-            async (request: Request, response: Response) => {
-                const zoneId = parseInt(request.params["zoneId"]);
-                const zone = await ZoneDatabase.getZoneById(zoneId);
-
-                response.send(zone);
-            }
-        );
-
         app.post(
             this.getUrlWithExtension("search"),
             authorize,
@@ -32,7 +19,7 @@ export class ZonesApiEndpoint extends ApiEndpoint {
                 const skip = request.body.skip;
                 const take = request.body.take;
 
-                const result = await ZoneDatabase.searchZone(
+                const result = await ActionDatabase.searchAction(
                     search,
                     skip,
                     take

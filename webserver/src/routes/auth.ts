@@ -118,13 +118,10 @@ export function configureAuthModule(app: any) {
 
     app.post(
         "/logout",
+        authorize,
         (request: Request, response: Response, next: NextFunction) => {
-            request.logout((error: any) => {
-                if (error) {
-                    return next(error);
-                } else {
-                    response.sendStatus(200);
-                }
+            request.session.destroy((_) => {
+                response.sendStatus(200);
             });
         }
     );

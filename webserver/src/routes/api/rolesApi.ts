@@ -1,10 +1,9 @@
 import { Request, Response } from "express";
 import { logMotion } from "../../audit/audit.js";
+import { ApiDatabase } from "../../database/apiDatabase.js";
 
-import { withPrismaClient } from "../../database/database.js";
-import { DEFAULT_ROLES } from "../../model/role.js";
+import { RoleDatabase } from "../../database/roleDatabase.js";
 import { ApiEndpoint } from "../apiEndpoint.js";
-import { API_ROUTES } from "../apiRoutes.js";
 import { authorize, authorizeOnRole } from "../auth.js";
 
 export class RolesApiEndpoint extends ApiEndpoint {
@@ -19,113 +18,63 @@ export class RolesApiEndpoint extends ApiEndpoint {
             authorizeOnRole,
             logMotion,
             async (request: Request, response: Response) => {
-                withPrismaClient(async (prisma) => {
-                    const role = await prisma.role.create({
-                        data: {
-                            name: request.body.roleName,
-                        },
-                    });
+                const result = await RoleDatabase.createRole(
+                    request.body.roleName
+                );
+                const apis = await ApiDatabase.getApis();
 
-                    // This right here might be problematic in the future, as we are
-                    // creating the role and generating all the relationships with
-                    // the APIs, so if we have many roles or many APIs, this can be
-                    // troublesome. For now this I think is the correct way, as we
-                    // can have a lot of control over the permissions, but we have
-                    // to see later.
-                    for (const api of await prisma.api.findMany()) {
-                        await prisma.apisOnRoles.create({
-                            data: {
-                                apiId: api.id,
-                                roleId: role.id,
-                            },
-                        });
-                    }
+                // This right here might be problematic in the future, as we are
+                // creating the role and generating all the relationships with
+                // the APIs, so if we have many roles or many APIs, this can be
+                // troublesome. For now this I think is the correct way, as we
+                // can have a lot of control over the permissions, but we have
+                // to see later.
+                for (const api of apis) {
+                    await ApiDatabase.createApisOnRoles(api.id, result!.id);
+                }
 
-                    response.sendStatus(200);
-                });
+                response.sendStatus(200);
             }
         );
 
         app.post(
-            API_ROUTES.roles.roles,
+            this.getUrlWithExtension("search"),
             authorize,
             authorizeOnRole,
             async (request: Request, response: Response) => {
-                withPrismaClient(async (prisma) => {
-                    const query = request.body;
-                    const whereQuery = {
-                        OR: [
-                            {
-                                name: {
-                                    contains: query.userSearch,
-                                },
-                            },
-                        ],
-                    };
+                const search = request.body.userSearch;
+                const skip = request.body.skip;
+                const take = request.body.take;
 
-                    let roles;
-                    let roleCount;
-
-                    // TODO: We should move this logic elsewhere.
-                    // This is not too good as we are mixing API functions and search
-                    // in the database. But for now is good.
-                    if (query.userSearch?.length > 0) {
-                        roleCount = await prisma.role.count({
-                            where: whereQuery,
-                        });
-                        roles = await prisma.role.findMany({
-                            where: whereQuery,
-                            skip: query.skip,
-                            take: query.take,
-                        });
-                    } else {
-                        roleCount = await prisma.role.count();
-                        roles = await prisma.role.findMany({
-                            skip: query.skip,
-                            take: query.take,
-                        });
-                    }
-
-                    response.send({
-                        search: roles,
-                        searchCount: roleCount,
-                    });
-                });
+                const result = await RoleDatabase.searchRole(
+                    search,
+                    skip,
+                    take
+                );
+                response.send(result);
             }
         );
 
         app.get(
-            API_ROUTES.roles.roleId,
+            this.getUrlWithExtension(":roleId"),
             authorize,
             authorizeOnRole,
             async (request: Request, response: Response) => {
-                withPrismaClient(async (prisma) => {
-                    const roleId = request.params["roleId"];
-                    const role = await prisma.role.findUnique({
-                        where: {
-                            id: parseInt(roleId),
-                        },
-                    });
-                    response.send(role);
-                });
+                const roleId = parseInt(request.params["roleId"]);
+                const result = await RoleDatabase.getRoleById(roleId);
+
+                response.send(result);
             }
         );
 
         app.get(
-            API_ROUTES.roles.roles,
+            this.getUrl(),
             authorize,
             authorizeOnRole,
-            async (request: Request, response: Response) => {
-                withPrismaClient(async (prisma) => {
-                    const roles = await prisma.role.findMany({
-                        where: {
-                            id: {
-                                not: DEFAULT_ROLES.superAdmin.id,
-                            },
-                        },
-                    });
-                    response.send(roles);
-                });
+            async (_: Request, response: Response) => {
+                const result = await RoleDatabase.getRoles();
+
+                response.send(result);
             }
         );
     }

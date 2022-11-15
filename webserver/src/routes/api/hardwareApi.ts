@@ -1,77 +1,46 @@
 import { Request, Response } from "express";
 
 import { withPrismaClient } from "../../database/database.js";
-import { API_ROUTES } from "../apiRoutes.js";
+import { HardwareDatabase } from "../../database/hardwareDatabase.js";
+import { ApiEndpoint } from "../apiEndpoint.js";
 import { authorize, authorizeOnRole } from "../auth.js";
 
-export function createHardwareApi(app: any) {
-    app.get(
-        API_ROUTES.hardware.getHardware,
-        authorize,
-        authorizeOnRole,
-        async (request: Request, response: Response) => {
-            withPrismaClient(async (prisma) => {
-                const hardwareId = request.params["hardwareId"];
-                const hardware = await prisma.hardware.findUnique({
-                    where: {
-                        id: parseInt(hardwareId),
-                    },
-                });
-                response.send(hardware);
-            });
-        }
-    );
+export class HardwareApiEndpoint extends ApiEndpoint {
+    constructor() {
+        super("hardware");
+    }
 
-    app.post(
-        API_ROUTES.hardware.hardware,
-        authorize,
-        authorizeOnRole,
-        async (request: Request, response: Response) => {
-            withPrismaClient(async (prisma) => {
-                const query = request.body;
-                const whereQuery = {
-                    OR: [
-                        {
-                            name: {
-                                contains: query.userSearch,
-                            },
-                        },
-                        {
-                            code: {
-                                contains: query.userSearch,
-                            },
-                        },
-                    ],
-                };
+    public registerMethods(app: any): void {
+        app.get(
+            this.getUrlWithExtension(":hardwareId"),
+            authorize,
+            authorizeOnRole,
+            async (request: Request, response: Response) => {
+                const hardwareId = parseInt(request.params["hardwareId"]);
+                const result = await HardwareDatabase.getHardwareById(
+                    hardwareId
+                );
 
-                let hardware;
-                let hardwareCount;
+                response.send(result);
+            }
+        );
 
-                // TODO: We should move this logic elsewhere.
-                // This is not too good as we are mixing API functions and search
-                // in the database. But for now is good.
-                if (query.userSearch?.length > 0) {
-                    hardwareCount = await prisma.hardware.count({
-                        where: whereQuery,
-                    });
-                    hardware = await prisma.hardware.findMany({
-                        where: whereQuery,
-                        skip: query.skip,
-                        take: query.take,
-                    });
-                } else {
-                    hardwareCount = await prisma.zone.count();
-                    hardware = await prisma.hardware.findMany({
-                        skip: query.skip,
-                        take: query.take,
-                    });
-                }
+        app.post(
+            this.getUrlWithExtension("search"),
+            authorize,
+            authorizeOnRole,
+            async (request: Request, response: Response) => {
+                const search = request.body.userSearch;
+                const skip = request.body.skip;
+                const take = request.body.take;
 
-                response.send({
-                    search: hardware,
-                    searchCount: hardwareCount,
-                });
-            });
-        }
-    );
+                const result = await HardwareDatabase.searchHardware(
+                    search,
+                    skip,
+                    take
+                );
+                response.send(result);
+            }
+        );
+    }
 }

@@ -1,17 +1,15 @@
-import { PrismaClient, User } from "@prisma/client";
+import { PrismaClient, Role, User } from "@prisma/client";
+import { genSaltSync, hashSync } from "bcrypt";
 
 import { SearchResult, SEARCH_AMOUNT, withPrismaClient } from "./database.js";
 
 export namespace UserDatabase {
-
-    export async function getUserByEmail(
-        email: string,
-    ): Promise<User | null> {
+    export async function getUserByEmail(email: string): Promise<User | null> {
         return await withPrismaClient<User | null>(
             async (prisma: PrismaClient) => {
                 const user = await prisma.user.findUnique({
                     where: {
-                        email: email,
+                        email,
                     },
                 });
 
@@ -40,12 +38,42 @@ export namespace UserDatabase {
         );
     }
 
-    export async function updateUser(user: any): Promise<User | null> {
+    export async function createUser(userInformation: {
+        firstName: string;
+        lastName: string;
+        email: string;
+        password: string;
+        role: Role;
+    }): Promise<User | null> {
+        return await withPrismaClient<User | null>(
+            async (prisma: PrismaClient) => {
+                const user = await prisma.user.create({
+                    data: {
+                        firstName: userInformation.firstName,
+                        lastName: userInformation.lastName,
+                        email: userInformation.email,
+                        password: hashSync(
+                            userInformation.password,
+                            genSaltSync(10)
+                        ),
+                        roleId: userInformation.role.id,
+                    },
+                });
+
+                return user ?? null;
+            }
+        );
+    }
+
+    export async function updateUser(
+        id: number,
+        user: any
+    ): Promise<User | null> {
         return await withPrismaClient<User | null>(
             async (prisma: PrismaClient) => {
                 const updatedUser = await prisma.user.update({
                     where: {
-                        id: user.id,
+                        id,
                     },
                     data: {
                         firstName: user.firstName,
