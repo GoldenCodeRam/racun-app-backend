@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import { logMotion } from "../../audit/audit.js";
-import { ApiDatabase } from "../../database/apiDatabase.js";
+import { logMotion } from "../../audit/audit";
+import { ApiDatabase } from "../../database/apiDatabase";
 
-import { RoleDatabase } from "../../database/roleDatabase.js";
-import { ApiEndpoint } from "../apiEndpoint.js";
-import { authorize, authorizeOnRole } from "../auth.js";
+import { RoleDatabase } from "../../database/roleDatabase";
+import { ApiEndpoint } from "../apiEndpoint";
+import { authorize, authorizeOnRole } from "../auth";
 
 export class RolesApiEndpoint extends ApiEndpoint {
     constructor() {

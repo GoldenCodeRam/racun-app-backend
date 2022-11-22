@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
 
-import { withPrismaClient } from "../../database/database.js";
-import { HardwareDatabase } from "../../database/hardwareDatabase.js";
-import { ApiEndpoint } from "../apiEndpoint.js";
-import { authorize, authorizeOnRole } from "../auth.js";
+import { HardwareDatabase } from "../../database/hardwareDatabase";
+import { ApiEndpoint } from "../apiEndpoint";
+import { authorize, authorizeOnRole } from "../auth";
 
 export class HardwareApiEndpoint extends ApiEndpoint {
     constructor() {

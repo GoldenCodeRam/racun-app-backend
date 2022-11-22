@@ -13,6 +13,7 @@ const app = express();
 
 // This is so the app can handle JSON requests in the body.
 app.use(json());
+
 // This is so the app can handle urlencoded forms.
 app.use(urlencoded({
     extended: true,

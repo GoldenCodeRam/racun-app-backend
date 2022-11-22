@@ -1,6 +1,6 @@
 import { Hardware, PrismaClient } from "@prisma/client";
 
-import { SearchResult, SEARCH_AMOUNT, withPrismaClient } from "./database.js";
+import { SearchResult, SEARCH_AMOUNT, withPrismaClient } from "./database";
 
 export namespace HardwareDatabase {
     export async function getHardwareById(

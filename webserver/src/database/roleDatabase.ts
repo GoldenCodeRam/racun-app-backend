@@ -1,6 +1,6 @@
 import { PrismaClient, Role } from "@prisma/client";
 
-import { SearchResult, SEARCH_AMOUNT, withPrismaClient } from "./database.js";
+import { SearchResult, SEARCH_AMOUNT, withPrismaClient } from "./database";
 
 export namespace RoleDatabase {
     export async function getRoleById(id: number): Promise<Role | null> {
@@ -18,13 +18,11 @@ export namespace RoleDatabase {
     }
 
     export async function getRoles(): Promise<Role[]> {
-        return await withPrismaClient<Role[]>(
-            async (prisma: PrismaClient) => {
-                const roles = await prisma.role.findMany();
+        return await withPrismaClient<Role[]>(async (prisma: PrismaClient) => {
+            const roles = await prisma.role.findMany();
 
-                return roles;
-            }
-        );
+            return roles;
+        });
     }
 
     export async function createRole(name: string): Promise<Role | null> {

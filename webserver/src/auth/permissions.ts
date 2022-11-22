@@ -1,27 +1,7 @@
 import { ApisOnRoles } from "@prisma/client";
 
-import { ApiDatabase } from "../database/apiDatabase.js";
-import { UserDatabase } from "../database/userDatabase.js";
-
-export interface Permission {
-  hasGet(): boolean;
-  hasPost(): boolean;
-  hasDelete(): boolean;
-}
-
-export class AllPermissions implements Permission {
-  hasGet(): boolean {
-    return true;
-  }
-
-  hasPost(): boolean {
-    return true;
-  }
-
-  hasDelete(): boolean {
-    return true;
-  }
-}
+import { ApiDatabase } from "../database/apiDatabase";
+import { UserDatabase } from "../database/userDatabase";
 
 /**
  * Use the user role, API route, to get the permissions the user has on that

@@ -1,6 +1,6 @@
 import { Action, PrismaClient } from "@prisma/client";
 
-import { SearchResult, SEARCH_AMOUNT, withPrismaClient } from "./database.js";
+import { SearchResult, SEARCH_AMOUNT, withPrismaClient } from "./database";
 
 export namespace ActionDatabase {
     export async function searchAction(
@@ -28,6 +28,9 @@ export namespace ActionDatabase {
                             {
                                 date: search,
                             },
+                            {
+                                userEmail: search,
+                            },
                         ],
                     };
                 }
@@ -39,9 +42,6 @@ export namespace ActionDatabase {
                     where: whereQuery ?? {},
                     skip: skip ?? 0,
                     take: take ?? SEARCH_AMOUNT,
-                    include: {
-                        user: true,
-                    },
                 });
 
                 return {

@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import { logMotion } from "../../audit/audit.js";
-import { ClientDatabase } from "../../database/clientDatabase.js";
+import { logMotion } from "../../audit/audit";
+import { ClientDatabase } from "../../database/clientDatabase";
 
-import { ApiEndpoint } from "../apiEndpoint.js";
-import { authorize, authorizeOnRole } from "../auth.js";
+import { ApiEndpoint } from "../apiEndpoint";
+import { authorize, authorizeOnRole } from "../auth";
 
 export class ClientsApiEndpoint extends ApiEndpoint {
     constructor() {
@@ -68,5 +68,28 @@ export class ClientsApiEndpoint extends ApiEndpoint {
                 response.send(result);
             }
         );
+
+        app.delete(
+            this.getUrlWithExtension("delete/:clientId"),
+            authorize,
+            authorizeOnRole,
+            logMotion,
+            async (request: Request, response: Response) => {
+                const clientId = parseInt(request.params["clientId"]);
+                await ClientDatabase.deleteClient(clientId);
+                response.sendStatus(200);
+            }
+        );
+
+        app.get(
+            this.getUrlWithExtension("accounts/"),
+            authorize,
+            authorizeOnRole,
+            logMotion,
+            async (_: Request, response: Response) => {
+                const clientAccounts = ClientDatabase.getClientAccounts();
+                response.send(clientAccounts);
+            }
+        )
     }
 }

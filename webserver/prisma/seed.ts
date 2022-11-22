@@ -1,7 +1,6 @@
-import { faker } from "@faker-js/faker";
 import { PrismaClient } from "@prisma/client";
 
-import { Seeder } from "./seeders/seeder.js";
+import { Seeder } from "./seeders/seeder";
 
 const prisma = new PrismaClient();
 

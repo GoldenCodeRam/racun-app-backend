@@ -1,8 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 
-import { DEFAULT_ROLES } from "../../src/model/role.js";
-import { RoleSeeder } from "./roleSeeder.js";
-import { DefaultSeeder } from "./seeder.js";
+import { DEFAULT_ROLES } from "../../src/model/role";
+import { RoleSeeder } from "./roleSeeder";
+import { DefaultSeeder } from "./seeder";
 
 export class APIsOnRolesSeeder implements DefaultSeeder {
     constructor(private roleSeeder: RoleSeeder) {}

@@ -1,6 +1,6 @@
 import { Api, ApisOnRoles, PrismaClient } from "@prisma/client";
 
-import { withPrismaClient } from "./database.js";
+import { withPrismaClient } from "./database";
 
 export namespace ApiDatabase {
     export async function getApi(name: string): Promise<Api | null> {

@@ -19,21 +19,19 @@ model User {
 
   role   Role @relation(fields: [roleId], references: [id])
   roleId Int
-
-  Action Action[]
 }
 
 model Role {
   id          Int           @id @default(autoincrement())
   name        String        @db.VarChar(255)
-  User        User[]
-  ApisOnRoles ApisOnRoles[]
+  user        User[]
+  apisOnRoles ApisOnRoles[]
 }
 
 model Api {
   id          Int           @id @default(autoincrement())
   name        String        @unique
-  ApisOnRoles ApisOnRoles[]
+  apisOnRoles ApisOnRoles[]
 }
 
 model Action {
@@ -42,8 +40,7 @@ model Action {
   url    String
   date   DateTime
 
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
+  userEmail String
 }
 
 model Place {
@@ -73,7 +70,7 @@ model Client {
   phone         String         @db.VarChar(100)
   address       String         @db.VarChar(255)
   email         String?        @db.VarChar(255)
-  ClientAccount ClientAccount?
+  clientAccount ClientAccount?
 }
 
 model Hardware {
@@ -81,8 +78,8 @@ model Hardware {
   model             String              @db.VarChar(255)
   name              String              @db.VarChar(255)
   details           String?
-  HardwareOnClients HardwareOnClients[]
-  HardwareOnZones   HardwareOnZones[]
+  hardwareOnClients HardwareOnClients[]
+  hardwareOnZones   HardwareOnZones[]
 }
 
 model Zone {
@@ -92,7 +89,7 @@ model Zone {
 
   place           Place             @relation(fields: [placeId], references: [id])
   placeId         Int
-  HardwareOnZones HardwareOnZones[]
+  hardwareOnZones HardwareOnZones[]
 }
 
 model Invoice {
@@ -147,20 +144,21 @@ model HardwareOnClients {
 }
 
 model ClientAccount {
-  id     Int @id @default(autoincrement())
-  status Int
+  id     Int     @id @default(autoincrement())
+  status Boolean @default(false)
 
-  client            Client              @relation(fields: [clientId], references: [id])
+  client            Client              @relation(fields: [clientId], references: [id], onDelete: Cascade)
   clientId          Int                 @unique
   clientContracts   ClientContract[]
-  HardwareOnClients HardwareOnClients[]
+  hardwareOnClients HardwareOnClients[]
 }
 
 model ClientContract {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   value     Float
-  status    Int
+  status    Boolean
   dateStart DateTime
+  dateEnd   DateTime?
 
   clientAccountId Int
   clientAccount   ClientAccount @relation(fields: [clientAccountId], references: [id])

@@ -1,7 +1,7 @@
 import { User } from "@prisma/client";
 import { NextFunction, Request, Response } from "express";
 
-import { withPrismaClient } from "../database/database.js";
+import { withPrismaClient } from "../database/database";
 
 /**
  * This function is used to save the movements done in the page. As this
@@ -18,7 +18,7 @@ export async function logMotion(
                 method: request.method,
                 url: request.route.path,
                 date: new Date(),
-                userId: (request.user as User).id,
+                userEmail: (request.user as User).email,
             },
         });
 

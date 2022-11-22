@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
-import { ActionDatabase } from "../../database/actionDatabase.js";
-import { UserDatabase } from "../../database/userDatabase.js";
-import { ApiEndpoint } from "../apiEndpoint.js";
-import { authorize, authorizeOnRole } from "../auth.js";
+import { ActionDatabase } from "../../database/actionDatabase";
+import { ApiEndpoint } from "../apiEndpoint";
+import { authorize, authorizeOnRole } from "../auth";
 
 export class ActionsApiEndpoint extends ApiEndpoint {
     constructor() {

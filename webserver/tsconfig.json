@@ -1,15 +1,21 @@
 {
-    "compilerOptions": {
-        "module": "esnext",
-        "moduleResolution": "node",
-        "sourceMap": true,
-        "outDir": "dist",
-        "rootDir": "src",
-        "strict": true,
-        "lib": [
-            "esnext"
-        ],
-        "esModuleInterop": true
-    },
-    "exclude": ["prisma"]
+  "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
+    "lib": [
+      "esnext"
+    ],
+    "esModuleInterop": true
+  },
+  "exclude": [
+    "prisma",
+    "test"
+  ],
+  "include": [
+    "src"
+  ]
 }

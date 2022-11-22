@@ -1,8 +1,24 @@
-import { Client, PrismaClient } from "@prisma/client";
+import { Client, ClientAccount, PrismaClient } from "@prisma/client";
 
-import { SearchResult, SEARCH_AMOUNT, withPrismaClient } from "./database.js";
+import { SearchResult, SEARCH_AMOUNT, withPrismaClient } from "./database";
 
 export namespace ClientDatabase {
+    export async function getClientAccounts() {
+        return await withPrismaClient<ClientAccount[]>(
+            async (prisma: PrismaClient) => {
+                return await prisma.clientAccount.findMany();
+            }
+        );
+    }
+
+    export async function getClientAccountById() {
+        return await withPrismaClient<ClientAccount[]>(
+            async (prisma: PrismaClient) => {
+                return await prisma.clientAccount.findMany();
+            }
+        );
+    }
+
     export async function searchClient(
         search: string = "",
         skip?: number,
@@ -58,6 +74,9 @@ export namespace ClientDatabase {
                     where: {
                         id: id,
                     },
+                    include: {
+                        clientAccount: true,
+                    },
                 });
 
                 return client ?? null;
@@ -65,7 +84,7 @@ export namespace ClientDatabase {
         );
     }
 
-    export async function getClients(): Promise<Client[]> {
+    export async function getClients() {
         return await withPrismaClient<Client[]>(
             async (prisma: PrismaClient) => {
                 return await prisma.client.findMany();
@@ -101,6 +120,18 @@ export namespace ClientDatabase {
                 });
 
                 return newClient ?? null;
+            }
+        );
+    }
+
+    export async function deleteClient(id: number): Promise<void | null> {
+        return await withPrismaClient<void | null>(
+            async (prisma: PrismaClient) => {
+                await prisma.client.delete({
+                    where: {
+                        id,
+                    },
+                });
             }
         );
     }

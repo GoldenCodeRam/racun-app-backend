@@ -2,9 +2,9 @@ import { faker } from "@faker-js/faker";
 import { PrismaClient } from "@prisma/client";
 import { genSaltSync, hashSync } from "bcrypt";
 
-import { DEFAULT_ROLES } from "../../src/model/role.js";
-import { RoleSeeder } from "./roleSeeder.js";
-import { DefaultSeeder } from "./seeder.js";
+import { DEFAULT_ROLES } from "../../src/model/role";
+import { RoleSeeder } from "./roleSeeder";
+import { DefaultSeeder } from "./seeder";
 
 export class UserSeeder implements DefaultSeeder {
     constructor(private roleSeeder: RoleSeeder) {}

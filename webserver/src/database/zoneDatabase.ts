@@ -1,6 +1,6 @@
 import { PrismaClient, Zone } from "@prisma/client";
 
-import { SearchResult, SEARCH_AMOUNT, withPrismaClient } from "./database.js";
+import { SearchResult, SEARCH_AMOUNT, withPrismaClient } from "./database";
 
 export namespace ZoneDatabase {
     export async function getZoneById(id: number): Promise<Zone | null> {

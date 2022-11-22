@@ -2,7 +2,7 @@
 import { faker } from "@faker-js/faker";
 import { PrismaClient } from "@prisma/client";
 
-import { DefaultSeeder } from "./seeder.js";
+import { DefaultSeeder } from "./seeder";
 
 const RANDOM_PLACE_AMOUNT = 30;
 

@@ -1,13 +1,14 @@
 import { PrismaClient } from "@prisma/client";
-import { ApiSeeder } from "./apiSeeder.js";
-import { APIsOnRolesSeeder } from "./apisOnRolesSeeder.js";
-import { CitySeeder } from "./citySeeder.js";
-import { ClientSeeder } from "./clientSeeder.js";
-import { HardwareSeeder } from "./hardwareSeeder.js";
-import { PlaceSeeder } from "./placeSeeder.js";
-import { RoleSeeder } from "./roleSeeder.js";
-import { UserSeeder } from "./userSeeder.js";
-import { ZoneSeeder } from "./zoneSeeder.js";
+import { ApiSeeder } from "./apiSeeder";
+import { APIsOnRolesSeeder } from "./apisOnRolesSeeder";
+import { CitySeeder } from "./citySeeder";
+import { ClientSeeder } from "./clientSeeder";
+import { HardwareSeeder } from "./hardwareSeeder";
+import { PlaceSeeder } from "./placeSeeder";
+import { RoleSeeder } from "./roleSeeder";
+import { ServiceSeeder } from "./serviceSeeder";
+import { UserSeeder } from "./userSeeder";
+import { ZoneSeeder } from "./zoneSeeder";
 
 export interface DefaultSeeder {
     seed(prisma: PrismaClient): Promise<void>;
@@ -25,6 +26,7 @@ export class Seeder {
         new ApiSeeder(),
         new APIsOnRolesSeeder(new RoleSeeder()),
         new ZoneSeeder(new PlaceSeeder()),
+        new ServiceSeeder(),
     ];
 
     public async runAllSeeders() {

@@ -1,9 +1,8 @@
 import { faker } from "@faker-js/faker";
 import { PrismaClient } from "@prisma/client";
-import { raw } from "@prisma/client/runtime/index.js";
-import { PlaceSeeder } from "./placeSeeder.js";
 
-import { DefaultSeeder } from "./seeder.js";
+import { PlaceSeeder } from "./placeSeeder";
+import { DefaultSeeder } from "./seeder";
 
 const RANDOM_ZONES_AMOUNT = 10;
 

@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
 
-import { withPrismaClient } from "../../database/database.js";
-import { ZoneDatabase } from "../../database/zoneDatabase.js";
-import { ApiEndpoint } from "../apiEndpoint.js";
-import { authorize, authorizeOnRole } from "../auth.js";
+import { ZoneDatabase } from "../../database/zoneDatabase";
+import { ApiEndpoint } from "../apiEndpoint";
+import { authorize, authorizeOnRole } from "../auth";
 
 export class ZonesApiEndpoint extends ApiEndpoint {
     constructor() {

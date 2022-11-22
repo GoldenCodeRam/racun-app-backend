@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { DefaultSeeder } from "./seeder";
 
-import { REGISTERED_APIS } from "../../src/routes/apis.js";
+import { REGISTERED_APIS } from "../../src/routes/apis";
 
 export class ApiSeeder implements DefaultSeeder {
     async seed(prisma: PrismaClient) {
