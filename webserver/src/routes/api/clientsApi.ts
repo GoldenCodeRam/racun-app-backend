@@ -10,7 +10,7 @@ export class ClientsApiEndpoint extends ApiEndpoint {
         super("clients");
     }
 
-    public registerMethods(app: any): void {
+    public getElements(app: any): void {
         app.get(
             this.getUrl(),
             authorize,
@@ -20,27 +20,9 @@ export class ClientsApiEndpoint extends ApiEndpoint {
                 response.send(result);
             }
         );
+    }
 
-        app.get(
-            this.getUrlWithExtension("count"),
-            authorize,
-            authorizeOnRole,
-            async (_: Request, response: Response) => {
-                const count = await ClientDatabase.countClients();
-                response.send(count);
-            }
-        );
-        app.get(
-            this.getUrlWithExtension(":clientId"),
-            authorize,
-            authorizeOnRole,
-            async (request: Request, response: Response) => {
-                const clientId = parseInt(request.params["clientId"]);
-                const client = await ClientDatabase.getClientById(clientId);
-
-                response.send(client);
-            }
-        );
+    public searchElements(app: any): void {
         app.post(
             this.getUrlWithExtension("search"),
             authorize,
@@ -58,6 +40,21 @@ export class ClientsApiEndpoint extends ApiEndpoint {
                 response.send(result);
             }
         );
+    }
+    public getElementById(app: any): void {
+        app.get(
+            this.getUrlWithExtension(":clientId"),
+            authorize,
+            authorizeOnRole,
+            async (request: Request, response: Response) => {
+                const clientId = parseInt(request.params["clientId"]);
+                const client = await ClientDatabase.getClientById(clientId);
+
+                response.send(client);
+            }
+        );
+    }
+    public createElement(app: any): void {
         app.post(
             this.getUrlWithExtension("create"),
             authorize,
@@ -68,7 +65,13 @@ export class ClientsApiEndpoint extends ApiEndpoint {
                 response.send(result);
             }
         );
+    }
 
+    public updateElement(app: any): void {
+        throw new Error("Method not implemented.");
+    }
+
+    public deleteElement(app: any): void {
         app.delete(
             this.getUrlWithExtension("delete/:clientId"),
             authorize,
@@ -78,6 +81,18 @@ export class ClientsApiEndpoint extends ApiEndpoint {
                 const clientId = parseInt(request.params["clientId"]);
                 await ClientDatabase.deleteClient(clientId);
                 response.sendStatus(200);
+            }
+        );
+    }
+
+    public registerCustomMethods(app: any): void {
+        app.get(
+            this.getUrlWithExtension("count"),
+            authorize,
+            authorizeOnRole,
+            async (_: Request, response: Response) => {
+                const count = await ClientDatabase.countClients();
+                response.send(count);
             }
         );
 
@@ -90,6 +105,6 @@ export class ClientsApiEndpoint extends ApiEndpoint {
                 const clientAccounts = ClientDatabase.getClientAccounts();
                 response.send(clientAccounts);
             }
-        )
+        );
     }
 }

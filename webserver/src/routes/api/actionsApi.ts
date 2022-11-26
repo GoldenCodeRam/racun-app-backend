@@ -36,7 +36,11 @@ export class ActionsApiEndpoint extends ApiEndpoint {
             authorizeOnRole,
             async (request: Request, response: Response) => {
                 const actionId = parseInt(request.params["actionId"]);
-                const result = await ActionDatabase.getActionById(actionId);
+                const changes = request.body;
+                const result = await ActionDatabase.updateActionById(
+                    actionId,
+                    changes
+                );
 
                 response.send(result);
             }
@@ -61,6 +65,39 @@ export class ActionsApiEndpoint extends ApiEndpoint {
     }
 
     public updateElement(app: any): void {
+        app.post(
+            this.getUrlWithExtension(":actionId"),
+            authorize,
+            authorizeOnRole,
+            logMotion,
+            async (request: Request, response: Response) => {
+                const actionInformation = request.body;
+                const result = await ActionDatabase.createAction(
+                    actionInformation
+                );
+
+                response.send(result);
+            }
+        );
+    }
+
+    public getElements(app: any): void {
+        app.get(
+            this.getUrl(),
+            authorize,
+            authorizeOnRole,
+            async (_request: Request, response: Response) => {
+                const actions = await ActionDatabase.getActions();
+
+                response.send(actions);
+            }
+        );
+    }
+
+    public deleteElement(app: any): void {
+        app.delete((_request: Request, response: Response) => {
+            response.sendStatus(403);
+        });
         throw new Error("Method not implemented.");
     }
 

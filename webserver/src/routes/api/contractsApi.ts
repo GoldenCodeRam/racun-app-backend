@@ -8,11 +8,19 @@ import { ApiEndpoint } from "../apiEndpoint";
 import { authorize, authorizeOnRole } from "../auth";
 
 export class ContractsApiEndpoint extends ApiEndpoint {
-    constructor() {
-        super("contracts");
+    public getElements(app: any): void {
+        throw new Error("Method not implemented.");
     }
 
-    public registerMethods(app: any): void {
+    public searchElements(app: any): void {
+        throw new Error("Method not implemented.");
+    }
+
+    public getElementById(app: any): void {
+        throw new Error("Method not implemented.");
+    }
+
+    public createElement(app: any): void {
         app.post(
             this.getUrlWithExtension("create"),
             authorize,
@@ -35,7 +43,17 @@ export class ContractsApiEndpoint extends ApiEndpoint {
                 response.send(result);
             }
         );
+    }
 
+    public updateElement(app: any): void {
+        throw new Error("Method not implemented.");
+    }
+
+    public deleteElement(app: any): void {
+        throw new Error("Method not implemented.");
+    }
+
+    public registerCustomMethods(app: any): void {
         app.get(
             this.getUrlWithExtension("by-client-account/:clientAccountId"),
             authorize,
@@ -53,7 +71,6 @@ export class ContractsApiEndpoint extends ApiEndpoint {
                 response.send(contracts);
             }
         );
-
         app.post(
             this.getUrlWithExtension("generate-invoice/:clientContractId"),
             authorize,
@@ -95,5 +112,9 @@ export class ContractsApiEndpoint extends ApiEndpoint {
                 }
             }
         );
+    }
+
+    constructor() {
+        super("contracts");
     }
 }

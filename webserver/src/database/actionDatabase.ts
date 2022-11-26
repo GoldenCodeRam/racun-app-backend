@@ -2,8 +2,25 @@ import { Action, PrismaClient } from "@prisma/client";
 
 import { SearchResult, SEARCH_AMOUNT, withPrismaClient } from "./database";
 
-export class ActionDatabase {
-    static async getActionById(id: number) {
+export namespace ActionDatabase {
+    export async function getActions() {
+        return await withPrismaClient(async (prisma: PrismaClient) => {
+            return await prisma.action.findMany();
+        });
+    }
+
+    export async function updateActionById(id: number, action: Action) {
+        return await withPrismaClient(async (prisma: PrismaClient) => {
+            return await prisma.action.update({
+                where: {
+                    id,
+                },
+                data: action,
+            });
+        });
+    }
+
+    export async function getActionById(id: number) {
         return await withPrismaClient(async (prisma: PrismaClient) => {
             return await prisma.action.findUnique({
                 where: {
@@ -13,7 +30,7 @@ export class ActionDatabase {
         });
     }
 
-    static async createAction(actionInformation: {
+    export async function createAction(actionInformation: {
         method: string;
         url: string;
         date: Date;
