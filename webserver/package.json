@@ -21,7 +21,6 @@
   "scripts": {
     "env:dev": "dotenv -e .env.development --",
     "env:prod": "dotenv -e .env.prod --",
-
     "build": "yarn env:dev babel src -d dist --extensions '.ts' --watch",
     "dev": "yarn env:dev nodemon dist/main.js",
     "start": "yarn concurrently --kill-others 'yarn build' 'yarn dev'",

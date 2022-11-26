@@ -2,7 +2,30 @@ import { Action, PrismaClient } from "@prisma/client";
 
 import { SearchResult, SEARCH_AMOUNT, withPrismaClient } from "./database";
 
-export namespace ActionDatabase {
+export class ActionDatabase {
+    static async getActionById(id: number) {
+        return await withPrismaClient(async (prisma: PrismaClient) => {
+            return await prisma.action.findUnique({
+                where: {
+                    id,
+                },
+            });
+        });
+    }
+
+    static async createAction(actionInformation: {
+        method: string;
+        url: string;
+        date: Date;
+        userEmail: string;
+    }) {
+        return await withPrismaClient(async (prisma: PrismaClient) => {
+            return await prisma.action.create({
+                data: actionInformation,
+            });
+        });
+    }
+
     export async function searchAction(
         search: string = "",
         skip?: number,

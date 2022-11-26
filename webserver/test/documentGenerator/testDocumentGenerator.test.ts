@@ -7,34 +7,39 @@ import { MAX_QR_CODE_CONTENT_SIZE } from "../../src/documentGenerator/invoice/he
 describe("testing", () => {
     test("testing something", () => {
         generateInvoice(
-            {
-                invoiceId: parseInt(faker.random.numeric(3)),
-                generationDate: new Date(),
-                client: {
-                    id: parseInt(faker.random.numeric(3)),
-                    firstName: faker.name.firstName(),
-                    lastName: faker.name.lastName(),
-                    email: faker.internet.email(),
-                    phone: faker.phone.number(),
-                    document: faker.random.numeric(9),
-                    address: faker.address.streetAddress(),
-                },
-                billingPeriod: {
-                    periodStart: faker.date.past(),
-                    periodEnd: faker.date.recent(),
-                },
-                paymentDate: faker.date.soon(),
-                suspensionDate: faker.date.future(),
-
-                // This number is important, as is the maximum number the QR code
-                // can generate a code to.
-                qrCode: parseInt(
-                    faker.random.numeric(MAX_QR_CODE_CONTENT_SIZE)
-                ),
-
-                invoiceElements: generateInvoiceElements(),
-                totalValue: parseInt(faker.random.numeric(9)),
-            },
+      {
+        client: {
+          id: 1,
+          firstName: faker.name.firstName(),
+          lastName: faker.name.lastName(),
+          address: faker.address.streetAddress(),
+          document: faker.random.numeric(9),
+          email: faker.internet.email(),
+          phone: faker.phone.number(),
+        },
+        generationDate: new Date(),
+        services: [
+          {
+            id: 1,
+            description: faker.lorem.paragraph(),
+            name: faker.company.name(),
+          }
+        ],
+        invoice: {
+          generationDate: new Date(),
+          adjustment: 10,
+          contractId: 1,
+          id: 1,
+          paymentDate: new Date(),
+          periodEnd: new Date(),
+          periodStart: new Date(),
+          status: 0,
+          suspensionDate: new Date(),
+          value: 1000,
+        },
+        qrCode: faker.random.numeric(9),
+        
+      },
             (document) => {
                 document.pipe(fs.createWriteStream("temp/invoice_test.pdf"));
             }
