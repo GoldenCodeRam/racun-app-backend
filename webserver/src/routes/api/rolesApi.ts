@@ -11,7 +11,54 @@ export class RolesApiEndpoint extends ApiEndpoint {
         super("roles");
     }
 
-    public registerMethods(app: any): void {
+    public getElements(app: any): void {
+        app.get(
+            this.getUrl(),
+            authorize,
+            authorizeOnRole,
+            async (_: Request, response: Response) => {
+                const result = await RoleDatabase.getRoles();
+
+                response.send(result);
+            }
+        );
+    }
+
+    public searchElements(app: any): void {
+        app.post(
+            this.getUrlWithExtension("search"),
+            authorize,
+            authorizeOnRole,
+            async (request: Request, response: Response) => {
+                const search = request.body.userSearch;
+                const skip = request.body.skip;
+                const take = request.body.take;
+
+                const result = await RoleDatabase.searchRole(
+                    search,
+                    skip,
+                    take
+                );
+                response.send(result);
+            }
+        );
+    }
+
+    public getElementById(app: any): void {
+        app.get(
+            this.getUrlWithExtension(":roleId"),
+            authorize,
+            authorizeOnRole,
+            async (request: Request, response: Response) => {
+                const roleId = parseInt(request.params["roleId"]);
+                const result = await RoleDatabase.getRoleById(roleId);
+
+                response.send(result);
+            }
+        );
+    }
+
+    public createElement(app: any): void {
         app.post(
             this.getUrlWithExtension("create"),
             authorize,
@@ -36,46 +83,42 @@ export class RolesApiEndpoint extends ApiEndpoint {
                 response.sendStatus(200);
             }
         );
+    }
 
-        app.post(
-            this.getUrlWithExtension("search"),
+    public updateElement(app: any): void {
+        app.put(
+            this.getUrlWithExtension("update/:roleId"),
             authorize,
             authorizeOnRole,
-            async (request: Request, response: Response) => {
-                const search = request.body.userSearch;
-                const skip = request.body.skip;
-                const take = request.body.take;
-
-                const result = await RoleDatabase.searchRole(
-                    search,
-                    skip,
-                    take
-                );
-                response.send(result);
-            }
-        );
-
-        app.get(
-            this.getUrlWithExtension(":roleId"),
-            authorize,
-            authorizeOnRole,
+            logMotion,
             async (request: Request, response: Response) => {
                 const roleId = parseInt(request.params["roleId"]);
-                const result = await RoleDatabase.getRoleById(roleId);
+                const changes = request.body;
 
-                response.send(result);
-            }
-        );
-
-        app.get(
-            this.getUrl(),
-            authorize,
-            authorizeOnRole,
-            async (_: Request, response: Response) => {
-                const result = await RoleDatabase.getRoles();
+                const result = await RoleDatabase.updateRoleById(
+                    roleId,
+                    changes
+                );
 
                 response.send(result);
             }
         );
     }
+
+    public deleteElement(app: any): void {
+        app.delete(
+            this.getUrlWithExtension("delete/:roleId"),
+            authorize,
+            authorizeOnRole,
+            logMotion,
+            async (request: Request, response: Response) => {
+                const roleId = parseInt(request.params["roleId"]);
+                const result = await RoleDatabase.deleteRoleById(roleId);
+
+                response.send(result);
+            }
+        );
+    }
+
+    public registerCustomMethods(_app: any): void {}
 }

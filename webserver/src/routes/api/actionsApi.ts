@@ -98,8 +98,7 @@ export class ActionsApiEndpoint extends ApiEndpoint {
         app.delete((_request: Request, response: Response) => {
             response.sendStatus(403);
         });
-        throw new Error("Method not implemented.");
     }
 
-    public registerCustomMethods(app: any): void {}
+    public registerCustomMethods(_app: any): void {}
 }

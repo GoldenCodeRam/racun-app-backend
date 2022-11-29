@@ -3,6 +3,45 @@ import { Hardware, PrismaClient } from "@prisma/client";
 import { SearchResult, SEARCH_AMOUNT, withPrismaClient } from "./database";
 
 export namespace HardwareDatabase {
+    export async function deleteHardware(id: number) {
+        return await withPrismaClient(async (prisma: PrismaClient) => {
+            return await prisma.hardware.delete({
+                where: {
+                    id,
+                },
+            });
+        });
+    }
+
+    export async function updateHardware(id: number, changes: Hardware) {
+        return await withPrismaClient(async (prisma: PrismaClient) => {
+            return await prisma.hardware.update({
+                where: {
+                    id,
+                },
+                data: changes,
+            });
+        });
+    }
+
+    export async function createHardware(hardwareData: {
+        name: string;
+        description: string;
+        model: string;
+    }) {
+        return await withPrismaClient(async (prisma: PrismaClient) => {
+            return await prisma.hardware.create({
+                data: hardwareData,
+            });
+        });
+    }
+
+    export async function getHardware() {
+        return await withPrismaClient(async (prisma: PrismaClient) => {
+            return await prisma.hardware.findMany();
+        });
+    }
+
     export async function getHardwareById(
         id: number
     ): Promise<Hardware | null> {

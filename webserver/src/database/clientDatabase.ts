@@ -3,15 +3,18 @@ import { Client, ClientAccount, PrismaClient } from "@prisma/client";
 import { SearchResult, SEARCH_AMOUNT, withPrismaClient } from "./database";
 
 export namespace ClientDatabase {
-    export async function getClientAccounts() {
-        return await withPrismaClient<ClientAccount[]>(
-            async (prisma: PrismaClient) => {
-                return await prisma.clientAccount.findMany();
-            }
-        );
+    export async function updateClientById(id: number, changes: Client) {
+        return await withPrismaClient(async (prisma: PrismaClient) => {
+            return await prisma.client.update({
+                where: {
+                    id,
+                },
+                data: changes,
+            });
+        });
     }
 
-    export async function getClientAccountById() {
+    export async function getClientAccounts() {
         return await withPrismaClient<ClientAccount[]>(
             async (prisma: PrismaClient) => {
                 return await prisma.clientAccount.findMany();
@@ -24,47 +27,45 @@ export namespace ClientDatabase {
         skip?: number,
         take?: number
     ): Promise<SearchResult<Client>> {
-        return await withPrismaClient<SearchResult<Client>>(
-            async (prisma: PrismaClient) => {
-                let whereQuery = null;
+        return await withPrismaClient(async (prisma: PrismaClient) => {
+            let whereQuery = null;
 
-                if (search.length > 0) {
-                    whereQuery = {
-                        OR: [
-                            {
-                                firstName: {
-                                    contains: search,
-                                },
+            if (search.length > 0) {
+                whereQuery = {
+                    OR: [
+                        {
+                            firstName: {
+                                contains: search,
                             },
-                            {
-                                lastName: {
-                                    contains: search,
-                                },
+                        },
+                        {
+                            lastName: {
+                                contains: search,
                             },
-                            {
-                                document: {
-                                    contains: search,
-                                },
+                        },
+                        {
+                            document: {
+                                contains: search,
                             },
-                        ],
-                    };
-                }
-
-                const clientCount = await prisma.client.count({
-                    where: whereQuery ?? {},
-                });
-                const clients = await prisma.client.findMany({
-                    where: whereQuery ?? {},
-                    skip: skip ?? 0,
-                    take: take ?? SEARCH_AMOUNT,
-                });
-
-                return {
-                    search: clients,
-                    searchCount: clientCount,
+                        },
+                    ],
                 };
             }
-        );
+
+            const clientCount = await prisma.client.count({
+                where: whereQuery ?? {},
+            });
+            const clients = await prisma.client.findMany({
+                where: whereQuery ?? {},
+                skip: skip ?? 0,
+                take: take ?? SEARCH_AMOUNT,
+            });
+
+            return {
+                search: clients,
+                searchCount: clientCount,
+            };
+        });
     }
 
     export async function getClientById(id: number): Promise<Client | null> {

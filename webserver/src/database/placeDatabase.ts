@@ -2,6 +2,22 @@ import { Place, PrismaClient } from "@prisma/client";
 import { SearchResult, SEARCH_AMOUNT, withPrismaClient } from "./database";
 
 export namespace PlaceDatabase {
+    export async function getPlaceById(id: number) {
+        return await withPrismaClient(async (prisma: PrismaClient) => {
+            return await prisma.place.findUnique({
+                where: {
+                    id,
+                },
+            });
+        });
+    }
+
+    export async function getPlaces() {
+        return await withPrismaClient(async (prisma: PrismaClient) => {
+            return await prisma.place.findMany();
+        });
+    }
+
     export async function searchPlace(
         search: string = "",
         skip?: number,
@@ -16,7 +32,7 @@ export namespace PlaceDatabase {
                         OR: [
                             {
                                 name: {
-                                    equals: search,
+                                    contains: search,
                                 },
                             },
                         ],
@@ -30,6 +46,10 @@ export namespace PlaceDatabase {
                     where: whereQuery ?? {},
                     skip: skip ?? 0,
                     take: take ?? SEARCH_AMOUNT,
+                    include: {
+                        parentPlace: true,
+                        places: true,
+                    },
                 });
 
                 return {

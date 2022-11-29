@@ -23,6 +23,7 @@ export async function withPrismaClient<T>(
 
     return result;
 }
+
 export interface SearchResult<T> {
     search: T[];
     searchCount: number;

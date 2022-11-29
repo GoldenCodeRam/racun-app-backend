@@ -41,6 +41,7 @@ export class ClientsApiEndpoint extends ApiEndpoint {
             }
         );
     }
+
     public getElementById(app: any): void {
         app.get(
             this.getUrlWithExtension(":clientId"),
@@ -54,6 +55,7 @@ export class ClientsApiEndpoint extends ApiEndpoint {
             }
         );
     }
+
     public createElement(app: any): void {
         app.post(
             this.getUrlWithExtension("create"),
@@ -68,7 +70,22 @@ export class ClientsApiEndpoint extends ApiEndpoint {
     }
 
     public updateElement(app: any): void {
-        throw new Error("Method not implemented.");
+        app.put(
+            this.getUrlWithExtension("update/:userId"),
+            authorize,
+            authorizeOnRole,
+            logMotion,
+            async (request: Request, response: Response) => {
+                const userId = parseInt(request.params["userId"]);
+                const changes = request.body;
+
+                const result = await ClientDatabase.updateClientById(
+                    userId,
+                    changes
+                );
+                response.send(result);
+            }
+        );
     }
 
     public deleteElement(app: any): void {

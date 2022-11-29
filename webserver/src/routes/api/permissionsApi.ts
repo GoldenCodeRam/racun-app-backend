@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { logMotion } from "../../audit/audit";
 
 import { ApiDatabase } from "../../database/apiDatabase";
 import { ApiEndpoint } from "../apiEndpoint";
@@ -9,7 +10,11 @@ export class PermissionsApiEndpoint extends ApiEndpoint {
         super("permissions");
     }
 
-    public registerMethods(app: any): void {
+    public getElements(_app: any): void {}
+
+    public searchElements(_app: any): void {}
+
+    public getElementById(app: any): void {
         app.get(
             this.getUrlWithExtension(":roleId"),
             authorize,
@@ -24,4 +29,25 @@ export class PermissionsApiEndpoint extends ApiEndpoint {
             }
         );
     }
+
+    public createElement(_app: any): void {}
+
+    public updateElement(app: any): void {
+        app.put(
+            this.getUrlWithExtension("changePermission/:apisOnRolesId"),
+            authorize,
+            authorizeOnRole,
+            logMotion,
+            async (request: Request, response: Response) => {
+                const changes = request.body;
+                const result = await ApiDatabase.updateApisOnRoles(changes);
+
+                response.send(result);
+            }
+        );
+    }
+
+    public deleteElement(_app: any): void {}
+
+    public registerCustomMethods(_app: any): void {}
 }

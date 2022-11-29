@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { logMotion } from "../../audit/audit";
 
 import { ZoneDatabase } from "../../database/zoneDatabase";
 import { ApiEndpoint } from "../apiEndpoint";
@@ -9,19 +10,9 @@ export class ZonesApiEndpoint extends ApiEndpoint {
         super("zones");
     }
 
-    public registerMethods(app: any): void {
-        app.get(
-            this.getUrlWithExtension(":zoneId"),
-            authorize,
-            authorizeOnRole,
-            async (request: Request, response: Response) => {
-                const zoneId = parseInt(request.params["zoneId"]);
-                const zone = await ZoneDatabase.getZoneById(zoneId);
+    public getElements(_app: any): void {}
 
-                response.send(zone);
-            }
-        );
-
+    public searchElements(app: any): void {
         app.post(
             this.getUrlWithExtension("search"),
             authorize,
@@ -40,4 +31,68 @@ export class ZonesApiEndpoint extends ApiEndpoint {
             }
         );
     }
+
+    public getElementById(app: any): void {
+        app.get(
+            this.getUrlWithExtension(":zoneId"),
+            authorize,
+            authorizeOnRole,
+            async (request: Request, response: Response) => {
+                const zoneId = parseInt(request.params["zoneId"]);
+                const zone = await ZoneDatabase.getZoneById(zoneId);
+
+                response.send(zone);
+            }
+        );
+    }
+
+    public createElement(app: any): void {
+        app.post(
+            this.getUrlWithExtension("create"),
+            authorize,
+            authorizeOnRole,
+            logMotion,
+            async (request: Request, response: Response) => {
+                const zoneData = request.body;
+                const result = await ZoneDatabase.createZone(zoneData);
+
+                response.send(result);
+            }
+        );
+    }
+
+    public updateElement(app: any): void {
+        app.put(
+            this.getUrlWithExtension("update/:zoneId"),
+            authorize,
+            authorizeOnRole,
+            logMotion,
+            async (request: Request, response: Response) => {
+                const zoneId = parseInt(request.params["zoneId"]);
+                const zoneData = request.body;
+
+                const result = await ZoneDatabase.updateZone(zoneId, zoneData);
+
+                response.send(result);
+            }
+        );
+    }
+
+    public deleteElement(app: any): void {
+        app.delete(
+            this.getUrlWithExtension("delete/:zoneId"),
+            authorize,
+            authorizeOnRole,
+            logMotion,
+            async (request: Request, response: Response) => {
+                const zoneId = parseInt(request.params["zoneId"]);
+
+                const result = await ZoneDatabase.deleteZoneById(zoneId);
+
+                response.send(result);
+            }
+        );
+    }
+
+    public registerCustomMethods(_app: any): void {}
 }

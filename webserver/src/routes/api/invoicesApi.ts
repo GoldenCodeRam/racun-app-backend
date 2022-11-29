@@ -10,7 +10,36 @@ export class InvoicesApiEndpoint extends ApiEndpoint {
         super("invoices");
     }
 
-    public registerMethods(app: any): void {
+    public getElements(app: any): void {
+        app.get(
+            this.getUrl(),
+            authorize,
+            authorizeOnRole,
+            async (request: Request, response: Response) => {
+                const result = await InvoiceDatabase.getInvoices();
+
+                response.send(result);
+            }
+        );
+    }
+
+    public searchElements(_app: any): void {}
+
+    public getElementById(app: any): void {
+        app.get(
+            this.getUrlWithExtension(":invoiceId"),
+            authorize,
+            authorizeOnRole,
+            async (request: Request, response: Response) => {
+                const invoiceId = parseInt(request.params["invoiceId"]);
+                const result = await InvoiceDatabase.getInvoiceById(invoiceId);
+
+                response.send(result);
+            }
+        );
+    }
+
+    public createElement(app: any): void {
         app.post(
             this.getUrlWithExtension("create"),
             authorize,
@@ -29,4 +58,43 @@ export class InvoicesApiEndpoint extends ApiEndpoint {
             }
         );
     }
+
+    public updateElement(app: any): void {
+        app.put(
+            this.getUrlWithExtension("update/:invoiceId"),
+            authorize,
+            authorizeOnRole,
+            logMotion,
+            async (request: Request, response: Response) => {
+                const invoiceId = parseInt(request.params["invoiceId"]);
+                const changes = InvoiceModel.invoiceDataFromInvoiceBodyRequest(
+                    request.body
+                );
+
+                const invoice = await InvoiceDatabase.updateInvoice(
+                    invoiceId,
+                    changes
+                );
+
+                response.send(invoice);
+            }
+        );
+    }
+
+    public deleteElement(app: any): void {
+        app.delete(
+            this.getUrlWithExtension("delete/:invoiceId"),
+            authorize,
+            authorizeOnRole,
+            logMotion,
+            async (request: Request, response: Response) => {
+                const invoiceId = parseInt(request.params["invoiceId"]);
+
+                const result = await InvoiceDatabase.deleteInvoice(invoiceId);
+
+                response.send(result);
+            }
+        );
+    }
+    public registerCustomMethods(_app: any): void {}
 }

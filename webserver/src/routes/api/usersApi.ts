@@ -10,27 +10,9 @@ export class UsersApiEndpoint extends ApiEndpoint {
         super("users");
     }
 
-    public registerMethods(app: any): void {
-        app.get(
-            this.getUrlWithExtension("current-user"),
-            authorize,
-            authorizeOnRole,
-            async (request: Request, response: Response) => {
-                response.send(request.user);
-            }
-        );
+    public getElements(_app: any): void {}
 
-        app.get(
-            this.getUrlWithExtension(":userId"),
-            authorize,
-            authorizeOnRole,
-            async (request: Request, response: Response) => {
-                const userId = parseInt(request.params["userId"]);
-                const result = await UserDatabase.getUserById(userId, true);
-                response.send(result);
-            }
-        );
-
+    public searchElements(app: any): void {
         app.post(
             this.getUrlWithExtension("search"),
             authorize,
@@ -48,7 +30,57 @@ export class UsersApiEndpoint extends ApiEndpoint {
                 response.send(result);
             }
         );
+    }
 
+    public getElementById(app: any): void {
+        app.get(
+            this.getUrlWithExtension("get/:userId"),
+            authorize,
+            authorizeOnRole,
+            async (request: Request, response: Response) => {
+                const userId = parseInt(request.params["userId"]);
+
+                const result = await UserDatabase.getUserById(userId, true);
+                response.send(result);
+            }
+        );
+    }
+
+    public createElement(app: any): void {
+        app.post(
+            this.getUrlWithExtension("create"),
+            authorize,
+            authorizeOnRole,
+            logMotion,
+            async (request: Request, response: Response) => {
+                const result = await UserDatabase.createUser(request.body);
+                response.send(result);
+            }
+        );
+    }
+
+    public updateElement(app: any): void {
+        app.put(
+            this.getUrlWithExtension("update/:userId"),
+            authorize,
+            authorizeOnRole,
+            logMotion,
+            async (request: Request, response: Response) => {
+                const userId = parseInt(request.params["userId"]);
+                try {
+                    const result = await UserDatabase.updateUser(
+                        userId,
+                        request.body
+                    );
+                    response.send(result);
+                } catch (error) {
+                    response.status(406).send(error);
+                }
+            }
+        );
+    }
+
+    public deleteElement(app: any): void {
         app.delete(
             this.getUrlWithExtension("delete/:userId"),
             authorize,
@@ -71,34 +103,15 @@ export class UsersApiEndpoint extends ApiEndpoint {
                 }
             }
         );
+    }
 
-        app.put(
-            this.getUrlWithExtension("edit/:userId"),
+    public registerCustomMethods(app: any): void {
+        app.get(
+            this.getUrlWithExtension("current-user"),
             authorize,
             authorizeOnRole,
-            logMotion,
             async (request: Request, response: Response) => {
-                const userId = parseInt(request.params["userId"]);
-                try {
-                    const result = await UserDatabase.updateUser(
-                        userId,
-                        request.body
-                    );
-                    response.send(result);
-                } catch (error) {
-                    response.status(406).send(error);
-                }
-            }
-        );
-
-        app.post(
-            this.getUrlWithExtension("create"),
-            authorize,
-            authorizeOnRole,
-            logMotion,
-            async (request: Request, response: Response) => {
-                const result = await UserDatabase.createUser(request.body);
-                response.send(result);
+                response.send(request.user);
             }
         );
     }

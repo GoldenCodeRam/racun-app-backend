@@ -20,24 +20,17 @@ export namespace UserDatabase {
         );
     }
 
-    export async function getUserById(
-        id: number,
-        withRole = false
-    ): Promise<User | null> {
-        return await withPrismaClient<User | null>(
-            async (prisma: PrismaClient) => {
-                const user = await prisma.user.findUnique({
-                    where: {
-                        id: id,
-                    },
-                    include: {
-                        role: withRole,
-                    },
-                });
-
-                return user ?? null;
-            }
-        );
+    export async function getUserById(id: number, withRole = false) {
+        return await withPrismaClient(async (prisma: PrismaClient) => {
+            return await prisma.user.findUnique({
+                where: {
+                    id,
+                },
+                include: {
+                    role: withRole,
+                },
+            });
+        });
     }
 
     export async function createUser(userInformation: {

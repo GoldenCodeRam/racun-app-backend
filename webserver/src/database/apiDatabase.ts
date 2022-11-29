@@ -3,6 +3,20 @@ import { Api, ApisOnRoles, PrismaClient } from "@prisma/client";
 import { withPrismaClient } from "./database";
 
 export namespace ApiDatabase {
+    export async function updateApisOnRoles(changes: ApisOnRoles) {
+        return await withPrismaClient(async (prisma: PrismaClient) => {
+            return await prisma.apisOnRoles.update({
+                where: {
+                    apiId_roleId: {
+                        apiId: changes.apiId,
+                        roleId: changes.roleId,
+                    },
+                },
+                data: changes,
+            });
+        });
+    }
+
     export async function getApi(name: string): Promise<Api | null> {
         return await withPrismaClient<Api | null>(
             async (prisma: PrismaClient) => {

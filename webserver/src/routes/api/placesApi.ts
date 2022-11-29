@@ -8,7 +8,19 @@ export class PlacesApiEndpoint extends ApiEndpoint {
         super("places");
     }
 
-    public registerMethods(app: any): void {
+    public getElements(app: any): void {
+        app.get(
+            this.getUrl(),
+            authorize,
+            authorizeOnRole,
+            async (_request: Request, response: Response) => {
+                const result = await PlaceDatabase.getPlaces();
+                response.send(result);
+            }
+        );
+    }
+
+    public searchElements(app: any): void {
         app.post(
             this.getUrlWithExtension("search"),
             authorize,
@@ -27,4 +39,26 @@ export class PlacesApiEndpoint extends ApiEndpoint {
             }
         );
     }
+
+    public getElementById(app: any): void {
+        app.get(
+            this.getUrlWithExtension("get/:placeId"),
+            authorize,
+            authorizeOnRole,
+            async (request: Request, response: Response) => {
+                const placeId = parseInt(request.params["placeId"]);
+
+                const result = await PlaceDatabase.getPlaceById(placeId);
+                response.send(result);
+            }
+        );
+    }
+
+    public createElement(_app: any): void {}
+
+    public updateElement(_app: any): void {}
+
+    public deleteElement(_app: any): void {}
+
+    public registerCustomMethods(_app: any): void {}
 }

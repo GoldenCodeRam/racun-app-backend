@@ -1,8 +1,38 @@
 import { PrismaClient, Role } from "@prisma/client";
+import { DEFAULT_ROLES } from "../model/role";
 
 import { SearchResult, SEARCH_AMOUNT, withPrismaClient } from "./database";
 
 export namespace RoleDatabase {
+    export async function updateRoleById(id: number, changes: Role) {
+        return await withPrismaClient(async (prisma: PrismaClient) => {
+            if (await canUpdateRole(id)) {
+                return await prisma.role.update({
+                    where: {
+                        id,
+                    },
+                    data: changes,
+                });
+            } else {
+                throw new Error("Can't update role!");
+            }
+        });
+    }
+
+    export async function deleteRoleById(id: number) {
+        return await withPrismaClient(async (prisma: PrismaClient) => {
+            if (await canDeleteRole(prisma, id)) {
+                return await prisma.role.delete({
+                    where: {
+                        id,
+                    },
+                });
+            } else {
+                throw new Error("Can't delete role!");
+            }
+        });
+    }
+
     export async function getRoleById(id: number): Promise<Role | null> {
         return await withPrismaClient<Role | null>(
             async (prisma: PrismaClient) => {
@@ -72,4 +102,26 @@ export namespace RoleDatabase {
             }
         );
     }
+}
+
+async function canDeleteRole(
+    prisma: PrismaClient,
+    id: number
+): Promise<boolean> {
+    if (id === DEFAULT_ROLES.superAdmin.id) {
+        return false;
+    }
+
+    const users = await prisma.user.findMany({
+        where: {
+            roleId: id,
+        },
+    });
+    // This means that if there is an user with this role, we can't delete the
+    // role.
+    return users.length === 0;
+}
+
+async function canUpdateRole(id: number): Promise<boolean> {
+    return id !== DEFAULT_ROLES.superAdmin.id;
 }

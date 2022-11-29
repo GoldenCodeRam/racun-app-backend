@@ -3,6 +3,35 @@ import { PrismaClient, Zone } from "@prisma/client";
 import { SearchResult, SEARCH_AMOUNT, withPrismaClient } from "./database";
 
 export namespace ZoneDatabase {
+    export async function deleteZoneById(id: number) {
+        return await withPrismaClient(async (prisma: PrismaClient) => {
+            return await prisma.zone.delete({
+                where: {
+                    id,
+                },
+            });
+        });
+    }
+
+    export async function updateZone(id: number, zone: Zone) {
+        return await withPrismaClient(async (prisma: PrismaClient) => {
+            return await prisma.zone.update({
+                where: {
+                    id,
+                },
+                data: zone,
+            });
+        });
+    }
+
+    export async function createZone(zone: Zone) {
+        return await withPrismaClient(async (prisma: PrismaClient) => {
+            return await prisma.zone.create({
+                data: zone,
+            });
+        });
+    }
+
     export async function getZoneById(id: number): Promise<Zone | null> {
         return await withPrismaClient<Zone | null>(
             async (prisma: PrismaClient) => {

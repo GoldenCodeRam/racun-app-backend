@@ -8,16 +8,40 @@ import { ApiEndpoint } from "../apiEndpoint";
 import { authorize, authorizeOnRole } from "../auth";
 
 export class ContractsApiEndpoint extends ApiEndpoint {
-    public getElements(app: any): void {
-        throw new Error("Method not implemented.");
+    constructor() {
+        super("contracts");
     }
 
-    public searchElements(app: any): void {
-        throw new Error("Method not implemented.");
+    public getElements(app: any): void {
+        app.get(
+            this.getUrl(),
+            authorize,
+            authorizeOnRole,
+            async (_request: Request, response: Response) => {
+                const elements = await ContractDatabase.getContracts();
+
+                response.send(elements);
+            }
+        );
     }
+
+    public searchElements(_app: any): void {}
 
     public getElementById(app: any): void {
-        throw new Error("Method not implemented.");
+        app.get(
+            this.getUrlWithExtension(":contractId"),
+            authorize,
+            authorizeOnRole,
+            async (request: Request, response: Response) => {
+                const contractId = parseInt(request.params["contractId"]);
+
+                const contract = await ContractDatabase.getContractById(
+                    contractId
+                );
+
+                response.send(contract);
+            }
+        );
     }
 
     public createElement(app: any): void {
@@ -46,11 +70,39 @@ export class ContractsApiEndpoint extends ApiEndpoint {
     }
 
     public updateElement(app: any): void {
-        throw new Error("Method not implemented.");
+        app.put(
+            this.getUrlWithExtension("update/:contractId"),
+            authorize,
+            authorizeOnRole,
+            logMotion,
+            async (request: Request, response: Response) => {
+                const contractId = parseInt(request.params["contractId"]);
+                const changes = request.body;
+
+                const result = await ContractDatabase.updateContract(
+                    contractId,
+                    changes
+                );
+                response.send(result);
+            }
+        );
     }
 
     public deleteElement(app: any): void {
-        throw new Error("Method not implemented.");
+        app.delete(
+            this.getUrlWithExtension("delete/:contractId"),
+            authorize,
+            authorizeOnRole,
+            logMotion,
+            async (request: Request, response: Response) => {
+                const contractId = parseInt(request.params["contractId"]);
+                const result = await ContractDatabase.deleteContract(
+                    contractId
+                );
+
+                response.send(result);
+            }
+        );
     }
 
     public registerCustomMethods(app: any): void {
@@ -112,9 +164,5 @@ export class ContractsApiEndpoint extends ApiEndpoint {
                 }
             }
         );
-    }
-
-    constructor() {
-        super("contracts");
     }
 }
