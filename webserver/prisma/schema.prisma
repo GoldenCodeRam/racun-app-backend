@@ -85,7 +85,7 @@ model Hardware {
 model Zone {
   id   Int    @id @default(autoincrement())
   name String @db.VarChar(255)
-  code String @db.VarChar(255)
+  code String @unique @db.VarChar(255)
 
   place           Place             @relation(fields: [placeId], references: [id])
   placeId         Int
@@ -124,23 +124,27 @@ model ApisOnRoles {
 }
 
 model HardwareOnZones {
+  id         Int      @id @default(autoincrement())
   hardware   Hardware @relation(fields: [hardwareId], references: [id])
   hardwareId Int
 
   zone   Zone @relation(fields: [zoneId], references: [id])
   zoneId Int
 
-  @@id([hardwareId, zoneId])
+  startDate DateTime
+  endDate   DateTime?
 }
 
 model HardwareOnClients {
+  id         Int      @id @default(autoincrement())
   hardware   Hardware @relation(fields: [hardwareId], references: [id])
   hardwareId Int
 
   clientAccount   ClientAccount @relation(fields: [clientAccountId], references: [id])
   clientAccountId Int
 
-  @@id([hardwareId, clientAccountId])
+  startDate DateTime
+  endDate   DateTime?
 }
 
 model ClientAccount {

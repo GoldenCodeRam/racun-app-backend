@@ -101,17 +101,20 @@ export class HardwareApiEndpoint extends ApiEndpoint {
             authorize,
             authorizeOnRole,
             logMotion,
-            async (request: Request, response: Response) => {
+            async (request: Request, response: Response, next: any) => {
                 const hardwareId = parseInt(request.params["hardwareId"]);
 
                 const result = await HardwareDatabase.deleteHardware(
                     hardwareId
                 );
 
-                response.send(result);
-            }
+                response.locals.result = result;
+                next();
+            },
+            this.sendOkResponse
         );
     }
 
-    public registerCustomMethods(_app: any): void {}
+    public registerCustomMethods(app: any): void {
+    }
 }

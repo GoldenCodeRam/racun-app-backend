@@ -29,6 +29,7 @@ export class PlacesApiEndpoint extends ApiEndpoint {
                 const search = request.body.userSearch;
                 const skip = request.body.skip;
                 const take = request.body.take;
+                console.log(search, skip, take);
 
                 const result = await PlaceDatabase.searchPlace(
                     search,

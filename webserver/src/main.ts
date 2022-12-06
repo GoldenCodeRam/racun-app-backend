@@ -15,18 +15,22 @@ const app = express();
 app.use(json());
 
 // This is so the app can handle urlencoded forms.
-app.use(urlencoded({
-    extended: true,
-}));
+app.use(
+    urlencoded({
+        extended: true,
+    })
+);
 
-app.use(cors({
-    origin: "http://localhost:4200",
-    credentials: true,
-}));
+app.use(
+    cors({
+        origin: "http://localhost:4200",
+        credentials: true,
+    })
+);
 
 app.use(
     session({
-        secret: 'RACUN',
+        secret: "RACUN",
         resave: false,
         saveUninitialized: true,
     })

@@ -1,33 +1,50 @@
 import { PrismaClient, Zone } from "@prisma/client";
+import { Err, Ok, Result } from "ts-results";
 
 import { SearchResult, SEARCH_AMOUNT, withPrismaClient } from "./database";
 
 export namespace ZoneDatabase {
-    export async function deleteZoneById(id: number) {
-        return await withPrismaClient(async (prisma: PrismaClient) => {
-            return await prisma.zone.delete({
-                where: {
-                    id,
-                },
-            });
-        });
+    export async function deleteZoneById(
+        id: number
+    ): Promise<Result<Zone, Error>> {
+        try {
+            return Ok(
+                await withPrismaClient(async (prisma: PrismaClient) => {
+                    return await prisma.zone.delete({
+                        where: {
+                            id,
+                        },
+                    });
+                })
+            );
+        } catch (error: any) {
+            return Err(error);
+        }
     }
 
-    export async function updateZone(id: number, zone: Zone) {
+    export async function updateZone(id: number, zone: any) {
         return await withPrismaClient(async (prisma: PrismaClient) => {
             return await prisma.zone.update({
                 where: {
                     id,
                 },
-                data: zone,
+                data: {
+                    name: zone.name,
+                    code: zone.code,
+                    placeId: zone.place.id,
+                },
             });
         });
     }
 
-    export async function createZone(zone: Zone) {
+    export async function createZone(zone: any) {
         return await withPrismaClient(async (prisma: PrismaClient) => {
             return await prisma.zone.create({
-                data: zone,
+                data: {
+                    name: zone.name,
+                    code: zone.code,
+                    placeId: zone.place.id,
+                },
             });
         });
     }
@@ -38,6 +55,9 @@ export namespace ZoneDatabase {
                 const zone = await prisma.zone.findUnique({
                     where: {
                         id: id,
+                    },
+                    include: {
+                        place: true,
                     },
                 });
 

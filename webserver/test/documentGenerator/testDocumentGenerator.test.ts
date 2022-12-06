@@ -2,7 +2,6 @@ import { generateInvoice } from "../../src/documentGenerator/invoice/invoiceGene
 import fs from "fs";
 
 import { faker } from "@faker-js/faker";
-import { MAX_QR_CODE_CONTENT_SIZE } from "../../src/documentGenerator/invoice/header";
 
 describe("testing", () => {
     test("testing something", () => {

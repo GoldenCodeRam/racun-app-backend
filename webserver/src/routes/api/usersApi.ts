@@ -1,7 +1,9 @@
 import { User } from "@prisma/client";
 import { Request, Response } from "express";
+import { Err } from "ts-results";
 import { logMotion } from "../../audit/audit";
 import { UserDatabase } from "../../database/userDatabase";
+import { Errors } from "../../model/errors/errors";
 import { ApiEndpoint } from "../apiEndpoint";
 import { authorize, authorizeOnRole } from "../auth";
 
@@ -52,10 +54,12 @@ export class UsersApiEndpoint extends ApiEndpoint {
             authorize,
             authorizeOnRole,
             logMotion,
-            async (request: Request, response: Response) => {
+            async (request: Request, response: Response, next: any) => {
                 const result = await UserDatabase.createUser(request.body);
-                response.send(result);
-            }
+                response.locals.result = result;
+                next();
+            },
+            this.sendObjectResponse
         );
     }
 
@@ -65,18 +69,17 @@ export class UsersApiEndpoint extends ApiEndpoint {
             authorize,
             authorizeOnRole,
             logMotion,
-            async (request: Request, response: Response) => {
+            async (request: Request, response: Response, next: any) => {
                 const userId = parseInt(request.params["userId"]);
-                try {
-                    const result = await UserDatabase.updateUser(
-                        userId,
-                        request.body
-                    );
-                    response.send(result);
-                } catch (error) {
-                    response.status(406).send(error);
-                }
-            }
+                const result = await UserDatabase.updateUser(
+                    userId,
+                    request.body
+                );
+                response.locals.result = result;
+
+                next();
+            },
+            this.sendObjectResponse
         );
     }
 
@@ -86,22 +89,19 @@ export class UsersApiEndpoint extends ApiEndpoint {
             authorize,
             authorizeOnRole,
             logMotion,
-            async (request: Request, response: Response) => {
+            async (request: Request, response: Response, next: any) => {
                 const userId = parseInt(request.params["userId"]);
-                try {
-                    if ((request.user as User).id == userId) {
-                        response
-                            .status(412)
-                            .send("Can't delete the current user.");
-                        return;
-                    }
-
-                    await UserDatabase.deleteUser(userId);
-                    response.sendStatus(200);
-                } catch (error) {
-                    response.status(406).send(error);
+                if ((request.user as User).id == userId) {
+                    response.locals.result = Err(
+                        Errors.getErrorFromCode("CDCUE")
+                    );
                 }
-            }
+
+                response.locals.result = await UserDatabase.deleteUser(userId);
+
+                next();
+            },
+            this.sendOkResponse
         );
     }
 

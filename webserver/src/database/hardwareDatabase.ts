@@ -1,16 +1,25 @@
 import { Hardware, PrismaClient } from "@prisma/client";
+import { Err, Ok, Result } from "ts-results";
 
 import { SearchResult, SEARCH_AMOUNT, withPrismaClient } from "./database";
 
 export namespace HardwareDatabase {
-    export async function deleteHardware(id: number) {
-        return await withPrismaClient(async (prisma: PrismaClient) => {
-            return await prisma.hardware.delete({
-                where: {
-                    id,
-                },
-            });
-        });
+    export async function deleteHardware(
+        id: number
+    ): Promise<Result<Hardware, Error>> {
+        try {
+            return Ok(
+                await withPrismaClient(async (prisma: PrismaClient) => {
+                    return await prisma.hardware.delete({
+                        where: {
+                            id,
+                        },
+                    });
+                })
+            );
+        } catch (error: any) {
+            return Err(error);
+        }
     }
 
     export async function updateHardware(id: number, changes: Hardware) {
@@ -77,7 +86,7 @@ export namespace HardwareDatabase {
                             },
                             {
                                 name: {
-                                    equals: search,
+                                    contains: search,
                                 },
                             },
                         ],
@@ -93,11 +102,36 @@ export namespace HardwareDatabase {
                     take: take ?? SEARCH_AMOUNT,
                 });
 
+                console.log(hardware);
+
                 return {
                     search: hardware,
                     searchCount: hardwareCount,
                 };
             }
         );
+    }
+
+    export async function isHardwareAvailable(
+        prisma: PrismaClient,
+        hardwareId: number
+    ) {
+        const where = {
+            hardwareId,
+            endDate: null,
+        };
+
+        const hardwareOnClients = await prisma.hardwareOnClients.findMany({
+            // If this finds any hardware that matches this hardware id
+            // AND the end date is not null, it means there is the same
+            // hardware and an active one, so don't do this.
+            where,
+        });
+
+        const hardwareOnZones = await prisma.hardwareOnZones.findMany({
+            where,
+        });
+
+        return hardwareOnClients.length === 0 && hardwareOnZones.length === 0;
     }
 }

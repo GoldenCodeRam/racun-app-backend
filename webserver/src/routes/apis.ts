@@ -2,6 +2,8 @@ import { ActionsApiEndpoint } from "./api/actionsApi";
 import { ClientsApiEndpoint } from "./api/clientsApi";
 import { ContractsApiEndpoint } from "./api/contractsApi";
 import { HardwareApiEndpoint } from "./api/hardwareApi";
+import { HardwareOnClientsApiEndpoint } from "./api/hardwareOnClientsApi";
+import { HardwareOnZonesApiEndpoint } from "./api/hardwareOnZonesApi";
 import { InvoicesApiEndpoint } from "./api/invoicesApi";
 import { PermissionsApiEndpoint } from "./api/permissionsApi";
 import { PlacesApiEndpoint } from "./api/placesApi";
@@ -23,6 +25,8 @@ export const REGISTERED_APIS: ApiEndpoint[] = [
     new PlacesApiEndpoint(),
     new ContractsApiEndpoint(),
     new InvoicesApiEndpoint(),
+    new HardwareOnZonesApiEndpoint(),
+    new HardwareOnClientsApiEndpoint(),
 ];
 
 export function configureApiModule(app: any) {

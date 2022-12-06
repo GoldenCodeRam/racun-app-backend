@@ -25,18 +25,22 @@ export namespace PlaceDatabase {
     ) {
         return await withPrismaClient<SearchResult<Place>>(
             async (prisma: PrismaClient) => {
-                let whereQuery = null;
+                let whereQuery: any = {
+                    // This is to show only the cities from Boyacá, if we
+                    // need to add more places, we have to figure out how
+                    // to do this from the frontend. But for now it will be
+                    // like this.
+                    parentPlaceId: 5,
+                };
 
                 if (search.length > 0) {
-                    whereQuery = {
-                        OR: [
-                            {
-                                name: {
-                                    contains: search,
-                                },
+                    whereQuery.AND = [
+                        {
+                            name: {
+                                contains: search,
                             },
-                        ],
-                    };
+                        },
+                    ];
                 }
 
                 const placesCount = await prisma.place.count({

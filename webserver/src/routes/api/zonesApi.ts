@@ -84,13 +84,15 @@ export class ZonesApiEndpoint extends ApiEndpoint {
             authorize,
             authorizeOnRole,
             logMotion,
-            async (request: Request, response: Response) => {
+            async (request: Request, response: Response, next: any) => {
                 const zoneId = parseInt(request.params["zoneId"]);
 
                 const result = await ZoneDatabase.deleteZoneById(zoneId);
+                response.locals.result = result;
 
-                response.send(result);
-            }
+                next();
+            },
+            this.sendOkResponse
         );
     }
 

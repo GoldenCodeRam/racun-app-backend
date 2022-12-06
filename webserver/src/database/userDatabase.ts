@@ -1,9 +1,10 @@
 import { PrismaClient, Role, User } from "@prisma/client";
 import { genSaltSync, hashSync } from "bcrypt";
+import { Err, Ok, Result } from "ts-results";
+import { ErrorResponse, Errors } from "../model/errors/errors";
 import { DEFAULT_ROLES } from "../model/role";
 
 import { SearchResult, SEARCH_AMOUNT, withPrismaClient } from "./database";
-import { DatabaseErrors } from "./exceptions/exceptions";
 
 export namespace UserDatabase {
     export async function getUserByEmail(email: string): Promise<User | null> {
@@ -39,9 +40,9 @@ export namespace UserDatabase {
         email: string;
         password: string;
         role: Role;
-    }): Promise<User | null> {
-        return await withPrismaClient<User | null>(
-            async (prisma: PrismaClient) => {
+    }): Promise<Result<User, ErrorResponse>> {
+        return await withPrismaClient(async (prisma: PrismaClient) => {
+            try {
                 const user = await prisma.user.create({
                     data: {
                         firstName: userInformation.firstName,
@@ -54,35 +55,43 @@ export namespace UserDatabase {
                         roleId: userInformation.role.id,
                     },
                 });
-
-                return user ?? null;
+                return Ok(user);
+            } catch (error: any) {
+                return Err(Errors.getErrorFromCode(error.code));
             }
-        );
+        });
     }
 
-    export async function deleteUser(id: number): Promise<void | null> {
-        return await withPrismaClient<void | null>(
-            async (prisma: PrismaClient) => {
-                if (await platformHasMoreThanOneSuperUser(prisma)) {
-                    await prisma.user.delete({
-                        where: {
-                            id,
-                        },
-                    });
-                } else {
-                    throw new DatabaseErrors.LastSuperUserError();
+    export async function deleteUser(
+        id: number
+    ): Promise<Result<User, ErrorResponse>> {
+        return await withPrismaClient(async (prisma: PrismaClient) => {
+            try {
+                if (id === DEFAULT_ROLES.superAdmin.id) {
+                    if (!(await platformHasMoreThanOneSuperUser(prisma))) {
+                        return Err(Errors.getErrorFromCode("LSUE"));
+                    }
                 }
+
+                const deletedUser = await prisma.user.delete({
+                    where: {
+                        id,
+                    },
+                });
+                return Ok(deletedUser);
+            } catch (error: any) {
+                return Err(Errors.getErrorFromCode(error.code));
             }
-        );
+        });
     }
 
     export async function updateUser(
         userToChangeId: number,
         userChanges: any
-    ): Promise<User | null> {
-        return await withPrismaClient<User | null>(
-            async (prisma: PrismaClient) => {
-                if (await canUpdateUser(prisma, userToChangeId, userChanges)) {
+    ): Promise<Result<User, ErrorResponse>> {
+        return await withPrismaClient(async (prisma: PrismaClient) => {
+            if (await canUpdateUser(prisma, userToChangeId, userChanges)) {
+                try {
                     const updatedUser = await prisma.user.update({
                         where: {
                             id: userToChangeId,
@@ -95,12 +104,14 @@ export namespace UserDatabase {
                         },
                     });
 
-                    return updatedUser ?? null;
-                } else {
-                    throw new DatabaseErrors.LastSuperUserError();
+                    return Ok(updatedUser);
+                } catch (error: any) {
+                    return Err(Errors.getErrorFromCode(error.code));
                 }
+            } else {
+                return Err(Errors.getErrorFromCode("LSUE"));
             }
-        );
+        });
     }
 
     export async function searchUser(
