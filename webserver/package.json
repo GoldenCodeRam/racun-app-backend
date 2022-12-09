@@ -31,7 +31,7 @@
         "start-dev": "yarn concurrently --kill-others 'yarn build' 'yarn dev'",
 
         "build-prod": "babel src -d dist --extensions '.ts'",
-        "start": "&& node dist/main.js",
+        "start": "yarn build-prod && node dist/main.js",
 
         "migrate:dev": "yarn env:dev yarn prisma migrate dev --create-only",
         "migrate:dev:reset": "yarn env:dev yarn prisma migrate reset --force",
