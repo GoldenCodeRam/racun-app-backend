@@ -96,5 +96,6 @@ export class InvoicesApiEndpoint extends ApiEndpoint {
             }
         );
     }
+
     public registerCustomMethods(_app: any): void {}
 }

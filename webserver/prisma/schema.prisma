@@ -107,6 +107,11 @@ model Invoice {
   contract   ClientContract @relation(fields: [contractId], references: [id])
 }
 
+model Config {
+  key   String @id
+  value String
+}
+
 // ============================ RELATION TABLES ===============================
 
 model ApisOnRoles {

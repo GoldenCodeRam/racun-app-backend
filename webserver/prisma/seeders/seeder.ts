@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { ApiSeeder } from "./apiSeeder";
 import { APIsOnRolesSeeder } from "./apisOnRolesSeeder";
 import { ClientSeeder } from "./clientSeeder";
+import { ConfigSeeder } from "./configSeeder";
 import { HardwareSeeder } from "./hardwareSeeder";
 import { RoleSeeder } from "./roleSeeder";
 import { ServiceSeeder } from "./serviceSeeder";
@@ -24,6 +25,7 @@ export class Seeder {
         // This is not needed anymore, as we are loading the Places manually.
         // new ZoneSeeder(new PlaceSeeder()),
         new ServiceSeeder(),
+        new ConfigSeeder(),
     ];
 
     public async runAllSeeders() {

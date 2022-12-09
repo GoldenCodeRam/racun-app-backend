@@ -1,5 +1,6 @@
 import { ActionsApiEndpoint } from "./api/actionsApi";
 import { ClientsApiEndpoint } from "./api/clientsApi";
+import { ConfigApiEndpoint } from "./api/configApi";
 import { ContractsApiEndpoint } from "./api/contractsApi";
 import { HardwareApiEndpoint } from "./api/hardwareApi";
 import { HardwareOnClientsApiEndpoint } from "./api/hardwareOnClientsApi";
@@ -27,6 +28,7 @@ export const REGISTERED_APIS: ApiEndpoint[] = [
     new InvoicesApiEndpoint(),
     new HardwareOnZonesApiEndpoint(),
     new HardwareOnClientsApiEndpoint(),
+    new ConfigApiEndpoint(),
 ];
 
 export function configureApiModule(app: any) {
