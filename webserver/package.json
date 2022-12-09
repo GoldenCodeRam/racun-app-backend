@@ -24,18 +24,18 @@
     },
     "scripts": {
         "env:dev": "dotenv -e .env.development --",
-        "env:prod": "dotenv -e .env.prod --",
 
         "dev": "yarn env:dev nodemon dist/main.js",
 
         "build": "yarn env:dev babel src -d dist --extensions '.ts' --watch",
-        "build-prod": "yarn env:prod babel src -d dist --extensions '.ts'",
-
         "start-dev": "yarn concurrently --kill-others 'yarn build' 'yarn dev'",
-        "start": "yarn 'build-prod' && node dist/main.js",
+
+        "build-prod": "babel src -d dist --extensions '.ts'",
+        "start": "&& node dist/main.js",
 
         "migrate:dev": "yarn env:dev yarn prisma migrate dev --create-only",
         "migrate:dev:reset": "yarn env:dev yarn prisma migrate reset --force",
+
         "migrate:prod": "yarn env:prod yarn prisma migrate dev",
         "migrate:prod:reset": "yarn env:prod yarn prisma migrate reset",
         "test": "jest"
