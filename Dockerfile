@@ -10,8 +10,6 @@ RUN git clone https://github.com/GoldenCodeRam/racun-app-backend.git
 
 WORKDIR racun-app-backend/webserver
 
-COPY ./webserver/.env.prod .
-
 RUN npm install
 
 EXPOSE 8000
