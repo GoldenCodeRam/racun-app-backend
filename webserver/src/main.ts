@@ -43,5 +43,5 @@ configureAuthModule(app);
 configureApiModule(app);
 
 app.listen(process.env.SERVER_PORT, () => {
-    console.log(`Server listening on ${process.env.SERVER_PORT}`);
+    console.log(`Server listening on ${process.env.PORT}`);
 });
