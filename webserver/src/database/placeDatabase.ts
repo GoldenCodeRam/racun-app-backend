@@ -30,7 +30,14 @@ export namespace PlaceDatabase {
                     // need to add more places, we have to figure out how
                     // to do this from the frontend. But for now it will be
                     // like this.
-                    parentPlaceId: 5,
+                    OR: [
+                        {
+                            parentPlaceId: 5,
+                        },
+                        {
+                            parentPlaceId: 26,
+                        },
+                    ],
                 };
 
                 if (search.length > 0) {
