@@ -6,7 +6,7 @@
     "author": "Luis Alejandro Quiroga Gómez <lualquigo@gmail.com>",
     "license": "MIT",
     "dependencies": {
-        "@prisma/client": "4.6.1",
+        "@prisma/client": "4.7.1",
         "@types/luxon": "^3.1.0",
         "bcrypt": "^5.0.1",
         "dotenv": "^16.0.2",
@@ -26,17 +26,12 @@
         "prisma-generate": "npx prisma generate",
         "build": "babel src -d dist --extensions '.ts'",
         "start": "node dist/main.js",
-
         "env:dev": "dotenv -e .env.development --",
-
         "dev": "yarn env:dev nodemon dist/main.js",
-
         "build-dev": "yarn env:dev babel src -d dist --extensions '.ts' --watch",
         "start-dev": "yarn concurrently --kill-others 'yarn build' 'yarn dev'",
-
         "migrate:dev": "yarn env:dev yarn prisma migrate dev --create-only",
         "migrate:dev:reset": "yarn env:dev yarn prisma migrate reset --force",
-
         "migrate:prod": "yarn env:prod yarn prisma migrate dev",
         "migrate:prod:reset": "yarn env:prod yarn prisma migrate reset",
         "test": "jest"

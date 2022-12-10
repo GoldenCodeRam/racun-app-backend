@@ -4,15 +4,15 @@ FROM node:lts-alpine
 
 WORKDIR server
 
-COPY ./webserver/package.json .
+COPY ./package.json .
 
 RUN npm install --quiet
 
-COPY ./webserver/tsconfig.json .
-COPY ./webserver/babel.config.json .
-COPY ./webserver/prisma/ prisma
-COPY ./webserver/res/ res
-COPY ./webserver/src/ src
+COPY ./tsconfig.json .
+COPY ./babel.config.json .
+COPY ./prisma/ prisma
+COPY ./res/ res
+COPY ./src/ src
 
 RUN npm run prisma-generate
 RUN npm run build
