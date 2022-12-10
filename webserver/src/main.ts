@@ -42,6 +42,6 @@ app.use(passport.session());
 configureAuthModule(app);
 configureApiModule(app);
 
-app.listen(process.env.SERVER_PORT, () => {
+app.listen(process.env.PORT, () => {
     console.log(`Server listening on ${process.env.PORT}`);
 });
