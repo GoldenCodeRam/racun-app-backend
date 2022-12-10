@@ -2,16 +2,23 @@ ARG PORT
 
 FROM node:lts-alpine
 
-RUN apk add git
-
 WORKDIR server
 
-RUN git clone https://github.com/GoldenCodeRam/racun-app-backend.git
+COPY ./webserver/package.json .
 
-WORKDIR racun-app-backend/webserver
+RUN npm install --quiet
 
-RUN npm install
+COPY ./webserver/tsconfig.json .
+COPY ./webserver/babel.config.json .
+COPY ./webserver/prisma/ prisma
+COPY ./webserver/res/ res
+COPY ./webserver/src/ src
+
+RUN npm run prisma-generate
+RUN npm run build
 
 EXPOSE $PORT
+
+RUN echo "Using port: $PORT"
 
 CMD npm run start

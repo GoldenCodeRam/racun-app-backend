@@ -23,8 +23,9 @@
         "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
     },
     "scripts": {
+        "prisma-generate": "npx prisma generate",
         "build": "babel src -d dist --extensions '.ts'",
-        "start": "yarn build && node dist/main.js",
+        "start": "node dist/main.js",
 
         "env:dev": "dotenv -e .env.development --",
 
