@@ -23,15 +23,15 @@
         "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
     },
     "scripts": {
+        "build": "babel src -d dist --extensions '.ts'",
+        "start": "yarn build-prod && node dist/main.js",
+
         "env:dev": "dotenv -e .env.development --",
 
         "dev": "yarn env:dev nodemon dist/main.js",
 
-        "build": "yarn env:dev babel src -d dist --extensions '.ts' --watch",
+        "build-dev": "yarn env:dev babel src -d dist --extensions '.ts' --watch",
         "start-dev": "yarn concurrently --kill-others 'yarn build' 'yarn dev'",
-
-        "build-prod": "babel src -d dist --extensions '.ts'",
-        "start": "yarn build-prod && node dist/main.js",
 
         "migrate:dev": "yarn env:dev yarn prisma migrate dev --create-only",
         "migrate:dev:reset": "yarn env:dev yarn prisma migrate reset --force",
