@@ -59,9 +59,9 @@ function generateQRCode(qrCodeContent: string): Content {
     return {
         qr: qrCodeContent,
         fit: 100,
-        version: 1,
+        version: 2,
         mask: 7,
         eccLevel: "H",
-        mode: "numeric",
+        mode: "alphanumeric",
     };
 }

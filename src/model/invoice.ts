@@ -2,6 +2,7 @@ export namespace InvoiceModel {
     export enum InvoiceStatus {
         PENDING,
         PAID,
+        LATE,
     }
 
     export type InvoiceBodyRequest = {
@@ -24,6 +25,7 @@ export namespace InvoiceModel {
         paymentDate: Date;
         suspensionDate: Date;
         value: number;
+        latePaymentValue: number;
         adjustment: number;
         status: InvoiceStatus;
         contractId: number;
@@ -39,8 +41,9 @@ export namespace InvoiceModel {
             paymentDate: new Date(invoiceBodyRequest.paymentDate),
             suspensionDate: new Date(invoiceBodyRequest.suspensionDate),
             value: invoiceBodyRequest.value,
+            latePaymentValue: 0,
             adjustment: invoiceBodyRequest.adjustment ?? 0,
-            status: InvoiceStatus.PENDING,
+            status: invoiceBodyRequest.status,
             contractId: invoiceBodyRequest.contractId,
         };
     }

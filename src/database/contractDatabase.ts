@@ -34,6 +34,7 @@ export namespace ContractDatabase {
         status: boolean;
         dateStart: Date;
         dateEnd?: Date;
+        currentDebt: number;
         clientAccountId: number;
         placeId: number;
         serviceId: number;

@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
+import JSZip from "jszip";
 import { logMotion } from "../../audit/audit";
 import { InvoiceDatabase } from "../../database/invoiceDatabase";
+import { generateInvoice } from "../../documentGenerator/invoice/invoiceGenerator";
 import { InvoiceModel } from "../../model/invoice";
 import { ApiEndpoint } from "../apiEndpoint";
 import { authorize, authorizeOnRole } from "../auth";
@@ -12,14 +14,16 @@ export class InvoicesApiEndpoint extends ApiEndpoint {
 
     public getElements(app: any): void {
         app.get(
-            this.getUrl(),
+            this.getUrlWithExtension("findAll"),
             authorize,
             authorizeOnRole,
-            async (request: Request, response: Response) => {
+            async (request: Request, response: Response, next: any) => {
                 const result = await InvoiceDatabase.getInvoices();
+                response.locals.result = result;
 
-                response.send(result);
-            }
+                next();
+            },
+            this.sendObjectResponse
         );
     }
 
@@ -27,7 +31,7 @@ export class InvoicesApiEndpoint extends ApiEndpoint {
 
     public getElementById(app: any): void {
         app.get(
-            this.getUrlWithExtension(":invoiceId"),
+            this.getUrlWithExtension("findOne/:invoiceId"),
             authorize,
             authorizeOnRole,
             async (request: Request, response: Response) => {
@@ -71,6 +75,8 @@ export class InvoicesApiEndpoint extends ApiEndpoint {
                     request.body
                 );
 
+                console.log(changes);
+
                 const invoice = await InvoiceDatabase.updateInvoice(
                     invoiceId,
                     changes
@@ -97,5 +103,72 @@ export class InvoicesApiEndpoint extends ApiEndpoint {
         );
     }
 
-    public registerCustomMethods(_app: any): void {}
+    public registerCustomMethods(app: any): void {
+        app.get(
+            this.getUrlWithExtension("generate-invoices"),
+            authorize,
+            authorizeOnRole,
+            logMotion,
+            async (request: Request, response: Response) => {
+                const zip = new JSZip();
+                const invoices = await InvoiceDatabase.getInvoices();
+
+                if (invoices.ok) {
+                    response.contentType("application/zip");
+                    new Promise<void>((resolve, reject) => {
+                        try {
+                            for (const invoice of invoices.val) {
+                                generateInvoice(
+                                    {
+                                        generationDate: new Date(
+                                            invoice.generationDate
+                                        ),
+                                        invoice: invoice,
+                                        client: invoice.contract.clientAccount
+                                            .client,
+                                        services: [invoice.contract.service],
+                                        qrCode: `${invoice.id}-${invoice.contractId}-${invoice.contract.clientAccountId}`,
+                                    },
+                                    (documentPipe) => {
+                                        zip.file(
+                                            `${invoice.id}-${invoice.contractId}-${invoice.contract.clientAccountId}.pdf`,
+                                            documentPipe
+                                        );
+                                    }
+                                );
+                            }
+                            resolve();
+                        } catch (error) {
+                            reject();
+                        }
+                    })
+                        .then(() => {
+                            zip.generateNodeStream({
+                                streamFiles: true,
+                            }).pipe(response);
+                        })
+                        .catch(() => {
+                            response.sendStatus(500);
+                        });
+                }
+            }
+        );
+
+        app.post(
+            this.getUrlWithExtension("findWithQrCode"),
+            authorize,
+            authorizeOnRole,
+            async (request: Request, response: Response, next: any) => {
+                const qrCode = (request.body.qrCode as string).split("-");
+
+                const result = await InvoiceDatabase.findOne(
+                    parseInt(qrCode[0])
+                );
+                response.locals.result = result;
+
+                next();
+            },
+            this.sendObjectResponse
+        );
+    }
 }

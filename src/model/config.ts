@@ -12,7 +12,9 @@ export const DEFAULT_CONFIG: {
     },
 };
 
-export function getNextInvoiceGenerationDate(currentDate: Date): Date {
+export function getNextInvoiceGenerationDate(
+    currentDate: Date = new Date()
+): Date {
     return DateTime.fromJSDate(currentDate)
         .plus({
             months: 1,

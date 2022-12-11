@@ -6,6 +6,7 @@ import cors from "cors";
 
 import { configureApiModule } from "./routes/apis.js";
 import { configureAuthModule } from "./routes/auth.js";
+import { configureCronModule, CronJobManager } from "./cron/cron.js";
 
 dotenv.config();
 
@@ -23,7 +24,7 @@ app.use(
 
 app.use(
     cors({
-        origin: "http://localhost:4200",
+        origin: process.env.CORS_URL,
         credentials: true,
     })
 );
@@ -31,8 +32,13 @@ app.use(
 app.use(
     session({
         secret: "RACUN",
+        proxy: true,
         resave: false,
         saveUninitialized: true,
+        cookie: {
+            secure: process.env.IS_PROD === "true",
+            sameSite: process.env.IS_PROD !== "true" ?? "none",
+        },
     })
 );
 
@@ -41,6 +47,8 @@ app.use(passport.session());
 
 configureAuthModule(app);
 configureApiModule(app);
+
+CronJobManager.getInstance();
 
 app.listen(process.env.PORT, () => {
     console.log(`Server listening on ${process.env.PORT}!`);

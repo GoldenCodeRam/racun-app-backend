@@ -3,6 +3,7 @@ import { generateRemovableSection } from "./removable";
 import { fonts, images } from "../utils/resources";
 import { generateHeader } from "./header";
 import { generateContentTable } from "./content";
+
 import { Client, Invoice, Service } from "@prisma/client";
 
 export function generateInvoice(

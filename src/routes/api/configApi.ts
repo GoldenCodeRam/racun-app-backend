@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { Ok } from "ts-results";
 import { logMotion } from "../../audit/audit";
+import { CronJobManager } from "../../cron/cron";
 import { ConfigDatabase } from "../../database/configDatabase";
 import { ApiEndpoint } from "../apiEndpoint";
 import { authorize, authorizeOnRole } from "../auth";
@@ -51,12 +52,16 @@ export class ConfigApiEndpoint extends ApiEndpoint {
             logMotion,
             async (request: Request, response: Response, next: any) => {
                 const invoiceConfigDto: InvoiceConfigDto = request.body;
-                console.log(invoiceConfigDto);
 
                 response.locals.result =
                     await ConfigDatabase.updateInvoiceGenerationDate(
                         invoiceConfigDto
                     );
+
+                if (response.locals.result.ok) {
+                    CronJobManager.getInstance().resetInvoiceGenerationDateJob();
+                }
+
                 next();
             },
             this.sendObjectResponse

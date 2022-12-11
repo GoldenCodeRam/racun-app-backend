@@ -19,6 +19,4 @@ RUN npm run build
 
 EXPOSE $PORT
 
-RUN echo "Using port: $PORT"
-
 CMD npm run start

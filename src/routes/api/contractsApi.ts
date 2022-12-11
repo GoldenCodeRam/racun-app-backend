@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import JSZip from "jszip";
 import { logMotion } from "../../audit/audit";
 import { ContractDatabase } from "../../database/contractDatabase";
 import { InvoiceDatabase } from "../../database/invoiceDatabase";
@@ -60,6 +61,7 @@ export class ContractsApiEndpoint extends ApiEndpoint {
                         ? new Date(contractInformation.dateEnd)
                         : undefined,
                     clientAccountId: contractInformation.clientAccountId,
+                    currentDebt: 0,
                     placeId: contractInformation.placeId,
                     serviceId: contractInformation.serviceId,
                 });
@@ -158,7 +160,13 @@ export class ContractsApiEndpoint extends ApiEndpoint {
                             qrCode: `${clientContractId}${invoice.id}`,
                         },
                         (documentPipe) => {
-                            documentPipe.pipe(response);
+                            const zip = new JSZip();
+
+                            zip.file(invoice.id.toString(), documentPipe);
+
+                            zip.generateNodeStream({
+                                streamFiles: true,
+                            }).pipe(response);
                         }
                     );
                 }
