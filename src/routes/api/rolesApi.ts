@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { Ok } from "ts-results";
 import { logMotion } from "../../audit/audit";
 import { ApiDatabase } from "../../database/apiDatabase";
 
@@ -120,5 +121,23 @@ export class RolesApiEndpoint extends ApiEndpoint {
         );
     }
 
-    public registerCustomMethods(_app: any): void {}
+    public registerCustomMethods(app: any): void {
+        app.put(
+            this.getUrlWithExtension("update-apis-on-roles"),
+            authorize,
+            authorizeOnRole,
+            logMotion,
+            async (request: Request, response: Response, next: any) => {
+                const changes = request.body;
+
+                for (const change of changes) {
+                    await ApiDatabase.updateApisOnRoles(change);
+                }
+
+                response.locals.result = Ok(true);
+                next();
+            },
+            this.sendOkResponse
+        );
+    }
 }

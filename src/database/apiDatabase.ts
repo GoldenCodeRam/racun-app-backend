@@ -1,10 +1,16 @@
 import { Api, ApisOnRoles, PrismaClient } from "@prisma/client";
+import { DEFAULT_ROLES } from "../model/role";
 
 import { withPrismaClient } from "./database";
 
 export namespace ApiDatabase {
     export async function updateApisOnRoles(changes: ApisOnRoles) {
         return await withPrismaClient(async (prisma: PrismaClient) => {
+            // If it's the super user, don't update
+            if (changes.roleId === DEFAULT_ROLES.superAdmin.id) {
+                return;
+            }
+
             return await prisma.apisOnRoles.update({
                 where: {
                     apiId_roleId: {
@@ -12,7 +18,11 @@ export namespace ApiDatabase {
                         roleId: changes.roleId,
                     },
                 },
-                data: changes,
+                data: {
+                    get: changes.get,
+                    post: changes.post,
+                    delete: changes.delete,
+                },
             });
         });
     }

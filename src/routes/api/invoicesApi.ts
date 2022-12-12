@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import JSZip from "jszip";
 import { logMotion } from "../../audit/audit";
+import { ContractDatabase } from "../../database/contractDatabase";
 import { InvoiceDatabase } from "../../database/invoiceDatabase";
 import { generateInvoice } from "../../documentGenerator/invoice/invoiceGenerator";
 import { InvoiceModel } from "../../model/invoice";
@@ -75,7 +76,9 @@ export class InvoicesApiEndpoint extends ApiEndpoint {
                     request.body
                 );
 
-                console.log(changes);
+                if (changes.status === InvoiceModel.InvoiceStatus.PAID) {
+                    await ContractDatabase.makeInvoicePayment(changes)
+                }
 
                 const invoice = await InvoiceDatabase.updateInvoice(
                     invoiceId,

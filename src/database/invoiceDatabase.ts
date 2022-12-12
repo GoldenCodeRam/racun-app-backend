@@ -34,7 +34,12 @@ export namespace InvoiceDatabase {
 
     export async function generateInvoices() {
         return await withPrismaClient(async (prisma: PrismaClient) => {
-            const contracts = await prisma.clientContract.findMany();
+            // Select only the current contracts.
+            const contracts = await prisma.clientContract.findMany({
+                where: {
+                    dateEnd: null,
+                },
+            });
 
             for (const contract of contracts) {
                 // We measure the amount of the late payments if there is any
@@ -60,6 +65,7 @@ export namespace InvoiceDatabase {
                         );
                     }
                 }
+
                 const nextPaymentDate =
                     await ConfigDatabase.getInvoiceGenerationDate();
                 if (nextPaymentDate.ok) {

@@ -1,6 +1,6 @@
 import pdfmake from "pdfmake";
 import { generateRemovableSection } from "./removable";
-import { fonts, images } from "../utils/resources";
+import { fonts } from "../utils/resources";
 import { generateHeader } from "./header";
 import { generateContentTable } from "./content";
 
@@ -18,10 +18,9 @@ export function generateInvoice(
 ) {
     const printer = new pdfmake(fonts);
     const pdfDocument = printer.createPdfKitDocument({
-        pageMargins: [30, 30, 30, 175],
+        pageMargins: [30, 30, 30, 220],
         content: [
             generateHeader({
-                qrCode: invoiceInformation.qrCode,
                 invoiceId: invoiceInformation.invoice.id,
                 generationDate: invoiceInformation.generationDate,
             }),
@@ -57,27 +56,47 @@ export function generateInvoice(
                                     "Periodo de facturación",
                                     {
                                         text: [
-                                            invoiceInformation.invoice.periodStart.toLocaleString(
-                                                "en-US"
-                                            ),
+                                            invoiceInformation.invoice.periodStart.getDay(),
+                                            "/",
+                                            invoiceInformation.invoice.periodStart.getMonth() +
+                                                1,
+                                            "/",
+                                            invoiceInformation.invoice.periodStart.getFullYear(),
                                             " a ",
-                                            invoiceInformation.invoice.periodEnd.toLocaleString(
-                                                "en-US"
-                                            ),
+                                            invoiceInformation.invoice.periodEnd.getDay(),
+                                            "/",
+                                            invoiceInformation.invoice.periodEnd.getMonth() +
+                                                1,
+                                            "/",
+                                            invoiceInformation.invoice.periodEnd.getFullYear(),
                                         ],
                                     },
                                 ],
                                 [
                                     "Pago oportuno",
-                                    invoiceInformation.invoice.paymentDate.toLocaleString(
-                                        "en-US"
-                                    ),
+                                    {
+                                        text: [
+                                            invoiceInformation.invoice.paymentDate.getDay(),
+                                            "/",
+                                            invoiceInformation.invoice.paymentDate.getMonth() +
+                                                1,
+                                            "/",
+                                            invoiceInformation.invoice.paymentDate.getFullYear(),
+                                        ],
+                                    },
                                 ],
                                 [
                                     "Fecha de suspensión",
-                                    invoiceInformation.invoice.suspensionDate.toLocaleString(
-                                        "en-US"
-                                    ),
+                                    {
+                                        text: [
+                                            invoiceInformation.invoice.suspensionDate.getDay(),
+                                            "/",
+                                            invoiceInformation.invoice.suspensionDate.getMonth() +
+                                                1,
+                                            "/",
+                                            invoiceInformation.invoice.suspensionDate.getFullYear(),
+                                        ],
+                                    },
                                 ],
                             ],
                         },
@@ -90,9 +109,11 @@ export function generateInvoice(
             },
             generateContentTable({
                 services: invoiceInformation.services,
+                invoice: invoiceInformation.invoice,
             }),
         ],
         footer: generateRemovableSection({
+            qrCode: invoiceInformation.qrCode,
             invoice: invoiceInformation.invoice,
             client: invoiceInformation.client,
         }),

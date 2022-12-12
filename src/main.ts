@@ -6,7 +6,7 @@ import cors from "cors";
 
 import { configureApiModule } from "./routes/apis.js";
 import { configureAuthModule } from "./routes/auth.js";
-import { configureCronModule, CronJobManager } from "./cron/cron.js";
+import { CronJobManager } from "./cron/cron.js";
 
 dotenv.config();
 

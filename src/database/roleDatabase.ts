@@ -40,6 +40,13 @@ export namespace RoleDatabase {
                     where: {
                         id: id,
                     },
+                    include: {
+                        apisOnRoles: {
+                            include: {
+                                api: true,
+                            },
+                        },
+                    },
                 });
 
                 return role ?? null;

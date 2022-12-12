@@ -51,23 +51,23 @@ export class ContractsApiEndpoint extends ApiEndpoint {
             authorize,
             authorizeOnRole,
             logMotion,
-            async (request: Request, response: Response) => {
+            async (request: Request, response: Response, next: any) => {
                 const contractInformation = request.body;
                 const result = await ContractDatabase.createContract({
                     value: contractInformation.value,
                     status: true,
                     dateStart: new Date(contractInformation.dateStart),
-                    dateEnd: contractInformation.dateEnd
-                        ? new Date(contractInformation.dateEnd)
-                        : undefined,
                     clientAccountId: contractInformation.clientAccountId,
                     currentDebt: 0,
                     placeId: contractInformation.placeId,
                     serviceId: contractInformation.serviceId,
                 });
 
-                response.send(result);
-            }
+                response.locals.result = result;
+
+                next();
+            },
+            this.sendObjectResponse
         );
     }
 
@@ -108,22 +108,44 @@ export class ContractsApiEndpoint extends ApiEndpoint {
     }
 
     public registerCustomMethods(app: any): void {
+        app.post(
+            this.getUrlWithExtension("terminateContract"),
+            authorize,
+            authorizeOnRole,
+            logMotion,
+            async (request: Request, response: Response, next: any) => {
+                const contractId = parseInt(request.body.contractId);
+
+                const result = await ContractDatabase.terminateContract(
+                    contractId
+                );
+
+                response.locals.result = result;
+
+                next();
+            },
+            this.sendOkResponse
+        );
+
         app.get(
             this.getUrlWithExtension("by-client-account/:clientAccountId"),
             authorize,
             authorizeOnRole,
-            async (request: Request, response: Response) => {
+            async (request: Request, response: Response, next: any) => {
                 const clientAccountId = parseInt(
                     request.params["clientAccountId"]
                 );
 
-                const contracts =
-                    await ContractDatabase.getContractsByClientAccount(
+                const result =
+                    await ContractDatabase.getContractByClientAccount(
                         clientAccountId
                     );
 
-                response.send(contracts);
-            }
+                response.locals.result = result;
+
+                next();
+            },
+            this.sendObjectResponse
         );
         app.post(
             this.getUrlWithExtension("generate-invoice/:clientContractId"),

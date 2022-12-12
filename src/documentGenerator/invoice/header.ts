@@ -10,7 +10,6 @@ import { images } from "../utils/resources";
 export const MAX_QR_CODE_CONTENT_SIZE = 16;
 
 export function generateHeader(headerInformation: {
-    qrCode: string;
     invoiceId: number;
     generationDate: Date;
 }): Content {
@@ -18,7 +17,7 @@ export function generateHeader(headerInformation: {
         {
             marginBottom: 8,
             table: {
-                widths: ["auto", "*", "auto"],
+                widths: ["auto", "*"],
                 body: [
                     [
                         {
@@ -32,7 +31,6 @@ export function generateHeader(headerInformation: {
                             alignment: "center",
                             fontSize: 32,
                         },
-                        generateQRCode(headerInformation.qrCode),
                     ],
                 ],
             },
@@ -46,22 +44,12 @@ export function generateHeader(headerInformation: {
                 widths: ["auto", "*"],
                 body: [
                     ["Cuenta de cobro", headerInformation.invoiceId.toString()],
-                    ["Fecha", headerInformation.generationDate.toString()],
+                    [
+                        "Fecha",
+                        headerInformation.generationDate.toLocaleString(),
+                    ],
                 ],
             },
         },
     ];
-}
-
-function generateQRCode(qrCodeContent: string): Content {
-    // TODO: Generate an error if the code is bigger than
-    // MAX_QR_CODE_CONTENT_SIZE.
-    return {
-        qr: qrCodeContent,
-        fit: 100,
-        version: 2,
-        mask: 7,
-        eccLevel: "H",
-        mode: "alphanumeric",
-    };
 }

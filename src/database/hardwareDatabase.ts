@@ -102,8 +102,6 @@ export namespace HardwareDatabase {
                     take: take ?? SEARCH_AMOUNT,
                 });
 
-                console.log(hardware);
-
                 return {
                     search: hardware,
                     searchCount: hardwareCount,

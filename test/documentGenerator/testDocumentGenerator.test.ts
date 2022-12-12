@@ -32,6 +32,7 @@ describe("testing", () => {
                     paymentDate: new Date(),
                     periodEnd: new Date(),
                     periodStart: new Date(),
+                    latePaymentValue: 0,
                     status: 0,
                     suspensionDate: new Date(),
                     value: 1000,
